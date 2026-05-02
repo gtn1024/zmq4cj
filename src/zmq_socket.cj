@@ -57,10 +57,10 @@ public class ZmqSocket <: Resource {
         send(data, 0)
     }
 
-    public func recv(): Array<UInt8> {
+    public func recv(flags: Int32): Array<UInt8> {
         let msg = unsafe { LibC.malloc<ZmqMsg>(count: 1) }
         unsafe { zmq_msg_init(msg) }
-        let rc = unsafe { zmq_msg_recv(msg, handle, 0) }
+        let rc = unsafe { zmq_msg_recv(msg, handle, flags) }
         if (rc == -1) {
             unsafe { zmq_msg_close(msg) }
             unsafe { LibC.free(msg) }
@@ -73,6 +73,10 @@ public class ZmqSocket <: Resource {
         unsafe { zmq_msg_close(msg) }
         unsafe { LibC.free(msg) }
         result
+    }
+
+    public func recv(): Array<UInt8> {
+        recv(0)
     }
 
     public func setSubscribe(topic: String): Unit {

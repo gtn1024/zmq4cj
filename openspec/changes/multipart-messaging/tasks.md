@@ -14,8 +14,8 @@
 
 ## 4. Socket recv flags 支持
 
-- [ ] 4.1 新增 `ZmqSocket.recv(flags: Int32): Array<UInt8>` 重载，支持传入 flags（DONTWAIT）
-- [ ] 4.2 将现有 `recv(): Array<UInt8>` 改为调用 `recv(0)`
+- [x] 4.1 新增 `ZmqSocket.recv(flags: Int32): Array<UInt8>` 重载，支持传入 flags（DONTWAIT）
+- [x] 4.2 将现有 `recv(): Array<UInt8>` 改为调用 `recv(0)`
 
 ## 5. hasReceiveMore 方法
 
