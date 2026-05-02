@@ -47,10 +47,10 @@
 
 ## 7. 通信模式测试
 
-- [ ] 7.1 编写 REQ/REP 测试：服务端 bind → recv → send 回复，客户端 connect → send → recv 回复
-- [ ] 7.2 编写 PUB/SUB 测试：发布者 bind → 发布，订阅者 connect → subscribe → recv（带主题过滤）
-- [ ] 7.3 编写 PUSH/PULL 测试：推送者 connect → send，拉取者 bind → recv
-- [ ] 7.4 验证所有测试在当前平台通过
+- [x] 7.1 编写 REQ/REP 测试：服务端 bind → recv → send 回复，客户端 connect → send → recv 回复
+- [x] 7.2 编写 PUB/SUB 测试：发布者 bind → 发布，订阅者 connect → subscribe → recv（带主题过滤）
+- [x] 7.3 编写 PUSH/PULL 测试：推送者 connect → send，拉取者 bind → recv
+- [x] 7.4 验证所有测试在当前平台通过
 
 ## 8. 文档
 

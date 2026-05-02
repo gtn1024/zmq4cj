@@ -14,8 +14,14 @@
 
 [dependencies]
 
+[target.x86_64-unknown-linux-gnu]
+  link-option = "-lstdc++ -lgcc_s"
+
 [target.x86_64-unknown-linux-gnu.ffi.c]
 zmq = { path = "vendor/build/linux/lib" }
+
+[target.aarch64-unknown-linux-gnu]
+  link-option = "-lstdc++ -lgcc_s"
 
 [target.aarch64-unknown-linux-gnu.ffi.c]
 zmq = { path = "vendor/build/linux/lib" }
@@ -25,6 +31,9 @@ zmq = { path = "vendor/build/darwin/lib" }
 
 [target.aarch64-apple-darwin.ffi.c]
 zmq = { path = "vendor/build/darwin/lib" }
+
+[target.x86_64-windows-gnu]
+  link-option = "-lstdc++"
 
 [target.x86_64-windows-gnu.ffi.c]
 zmq = { path = "vendor/build/windows/lib" }
