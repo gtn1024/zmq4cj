@@ -8,12 +8,12 @@
 
 ## 2. FFI 声明
 
-- [ ] 2.1 创建 `src/zmq_ffi.cj`，声明上下文管理函数（zmq_ctx_new, zmq_ctx_term, zmq_ctx_set, zmq_ctx_get）
-- [ ] 2.2 添加 Socket 管理 FFI 声明（zmq_socket, zmq_close, zmq_setsockopt, zmq_getsockopt）
-- [ ] 2.3 添加连接 FFI 声明（zmq_bind, zmq_connect, zmq_unbind, zmq_disconnect）
-- [ ] 2.4 添加消息收发 FFI 声明（zmq_send, zmq_recv）
-- [ ] 2.5 添加错误处理 FFI 声明（zmq_errno, zmq_strerror）
-- [ ] 2.6 验证所有类型映射正确（void* → CPointer<Unit>, size_t → UIntNative, int → Int32, const char* → CString）
+- [x] 2.1 创建 `src/zmq_ffi.cj`，声明上下文管理函数（zmq_ctx_new, zmq_ctx_term, zmq_ctx_set, zmq_ctx_get）
+- [x] 2.2 添加 Socket 管理 FFI 声明（zmq_socket, zmq_close, zmq_setsockopt, zmq_getsockopt）
+- [x] 2.3 添加连接 FFI 声明（zmq_bind, zmq_connect, zmq_unbind, zmq_disconnect）
+- [x] 2.4 添加消息收发 FFI 声明（zmq_send, zmq_recv）
+- [x] 2.5 添加错误处理 FFI 声明（zmq_errno, zmq_strerror）
+- [x] 2.6 验证所有类型映射正确（void* → CPointer<Unit>, size_t → UIntNative, int → Int32, const char* → CString）
 
 ## 3. 类型与常量
 
