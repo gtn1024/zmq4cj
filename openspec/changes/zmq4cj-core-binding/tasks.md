@@ -17,9 +17,9 @@
 
 ## 3. 类型与常量
 
-- [ ] 3.1 创建 `src/zmq_types.cj`，定义 `SocketType` 枚举（PAIR=0, PUB=1, SUB=2, REQ=3, REP=4, DEALER=5, ROUTER=6, PULL=7, PUSH=8）
-- [ ] 3.2 添加 `SocketOption` 枚举（SUBSCRIBE=6, UNSUBSCRIBE=7, LINGER=17, SNDHWM=23, RCVHWM=24, RCVTIMEO=27, SNDTIMEO=28）
-- [ ] 3.3 添加 `SendRecvFlags` 枚举（DONTWAIT=1, SNDMORE=2）
+- [x] 3.1 创建 `src/zmq_types.cj`，定义 `SocketType` 枚举（PAIR=0, PUB=1, SUB=2, REQ=3, REP=4, DEALER=5, ROUTER=6, PULL=7, PUSH=8）
+- [x] 3.2 添加 `SocketOption` 枚举（SUBSCRIBE=6, UNSUBSCRIBE=7, LINGER=17, SNDHWM=23, RCVHWM=24, RCVTIMEO=27, SNDTIMEO=28）
+- [x] 3.3 添加 `SendRecvFlags` 枚举（DONTWAIT=1, SNDMORE=2）
 
 ## 4. 错误处理
 
