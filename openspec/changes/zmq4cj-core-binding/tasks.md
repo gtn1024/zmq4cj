@@ -23,8 +23,8 @@
 
 ## 4. 错误处理
 
-- [ ] 4.1 创建 `src/zmq_error.cj`，定义 `ZmqError` 类（继承 Exception，包含 errno + message）
-- [ ] 4.2 添加内部辅助函数 `checkResult(rc: Int32)`，rc == -1 时抛出 ZmqError
+- [x] 4.1 创建 `src/zmq_error.cj`，定义 `ZmqError` 类（继承 Exception，包含 errno + message）
+- [x] 4.2 添加内部辅助函数 `checkResult(rc: Int32)`，rc == -1 时抛出 ZmqError
 
 ## 5. 上下文管理
 
