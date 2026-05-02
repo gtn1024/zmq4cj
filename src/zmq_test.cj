@@ -122,4 +122,94 @@ public class ZmqPatternTest {
         pull.close()
         ctx.close()
     }
+
+    @TestCase
+    func testMultipartPushPull(): Unit {
+        let ctx = ZmqContext()
+        let pull = ctx.socket(SocketType.PULL)
+        let push = ctx.socket(SocketType.PUSH)
+
+        pull.bind("tcp://*:5560")
+        push.connect("tcp://localhost:5560")
+
+        sleep(Duration.millisecond * 100)
+
+        push.sendMultipart([
+            "header".toArray(),
+            "payload".toArray()
+        ])
+
+        let frames = pull.recvMultipart()
+        @Assert(frames.size, 2)
+        @Assert(String.fromUtf8(frames[0]), "header")
+        @Assert(String.fromUtf8(frames[1]), "payload")
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testMultipartRouterDealer(): Unit {
+        let ctx = ZmqContext()
+        let router = ctx.socket(SocketType.ROUTER)
+        let dealer = ctx.socket(SocketType.DEALER)
+
+        router.bind("tcp://*:5561")
+        dealer.connect("tcp://localhost:5561")
+
+        sleep(Duration.millisecond * 100)
+
+        dealer.sendMultipart([
+            "part1".toArray(),
+            "part2".toArray(),
+            "part3".toArray()
+        ])
+
+        let identity = router.recv()
+        let frames = router.recvMultipart()
+        @Assert(frames.size, 3)
+        @Assert(String.fromUtf8(frames[0]), "part1")
+        @Assert(String.fromUtf8(frames[1]), "part2")
+        @Assert(String.fromUtf8(frames[2]), "part3")
+        @Assert(identity.size > 0, true)
+
+        dealer.close()
+        router.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testHasReceiveMore(): Unit {
+        let ctx = ZmqContext()
+        let pull = ctx.socket(SocketType.PULL)
+        let push = ctx.socket(SocketType.PUSH)
+
+        pull.bind("tcp://*:5562")
+        push.connect("tcp://localhost:5562")
+
+        sleep(Duration.millisecond * 100)
+
+        push.sendMultipart([
+            "frame1".toArray(),
+            "frame2".toArray(),
+            "frame3".toArray()
+        ])
+
+        let f1 = pull.recv(0)
+        @Assert(String.fromUtf8(f1), "frame1")
+        @Assert(pull.hasReceiveMore(), true)
+
+        let f2 = pull.recv(0)
+        @Assert(String.fromUtf8(f2), "frame2")
+        @Assert(pull.hasReceiveMore(), true)
+
+        let f3 = pull.recv(0)
+        @Assert(String.fromUtf8(f3), "frame3")
+        @Assert(pull.hasReceiveMore(), false)
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
 }

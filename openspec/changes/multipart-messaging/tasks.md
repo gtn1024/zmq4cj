@@ -28,7 +28,7 @@
 
 ## 7. 测试
 
-- [ ] 7.1 编写多帧收发测试：PUSH 端 `sendMultipart([header, payload])`，PULL 端 `recvMultipart()` 验证收到 2 帧
-- [ ] 7.2 编写 ROUTER/DEALER 多帧测试：验证 identity frame + body frame 的多帧模式
-- [ ] 7.3 编写 hasReceiveMore 测试：发送多帧消息，验证接收端 RCVMORE 状态变化
-- [ ] 7.4 验证所有已有测试仍然通过（向后兼容）
+- [x] 7.1 编写多帧收发测试：PUSH 端 `sendMultipart([header, payload])`，PULL 端 `recvMultipart()` 验证收到 2 帧
+- [x] 7.2 编写 ROUTER/DEALER 多帧测试：验证 identity frame + body frame 的多帧模式
+- [x] 7.3 编写 hasReceiveMore 测试：发送多帧消息，验证接收端 RCVMORE 状态变化
+- [x] 7.4 验证所有已有测试仍然通过（向后兼容）
