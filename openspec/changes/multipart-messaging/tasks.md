@@ -9,8 +9,8 @@
 
 ## 3. Socket send 迁移与 flags 支持
 
-- [ ] 3.1 将 `ZmqSocket.send(data: Array<UInt8>)` 内部从 `zmq_send` 迁移到 `zmq_msg_init_size` + copy + `zmq_msg_send` + `zmq_msg_close`（保持签名不变）
-- [ ] 3.2 新增 `ZmqSocket.send(data: Array<UInt8>, flags: Int32)` 重载，支持传入 flags（SNDMORE、DONTWAIT）
+- [x] 3.1 将 `ZmqSocket.send(data: Array<UInt8>)` 内部从 `zmq_send` 迁移到 `zmq_msg_init_size` + copy + `zmq_msg_send` + `zmq_msg_close`（保持签名不变）
+- [x] 3.2 新增 `ZmqSocket.send(data: Array<UInt8>, flags: Int32)` 重载，支持传入 flags（SNDMORE、DONTWAIT）
 
 ## 4. Socket recv flags 支持
 

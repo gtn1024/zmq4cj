@@ -37,13 +37,24 @@ public class ZmqSocket <: Resource {
         freeCString(cs)
     }
 
-    public func send(data: Array<UInt8>): Unit {
-        let buf = unsafe { LibC.malloc<UInt8>(count: data.size) }
-        copyArrayToCPointer(data, buf)
-        unsafe {
-            checkResult(zmq_send(handle, CPointer<Unit>(buf), UIntNative(data.size), 0))
+    public func send(data: Array<UInt8>, flags: Int32): Unit {
+        let msg = unsafe { LibC.malloc<ZmqMsg>(count: 1) }
+        unsafe { checkResult(zmq_msg_init_size(msg, UIntNative(data.size))) }
+        let dataPtr = unsafe { CPointer<UInt8>(zmq_msg_data(msg)) }
+        copyArrayToCPointer(data, dataPtr)
+        let rc = unsafe { zmq_msg_send(msg, handle, flags) }
+        if (rc == -1) {
+            let err = unsafe { zmq_errno() }
+            unsafe { zmq_msg_close(msg) }
+            unsafe { LibC.free(msg) }
+            throw ZmqError(err)
         }
-        unsafe { LibC.free(buf) }
+        unsafe { zmq_msg_close(msg) }
+        unsafe { LibC.free(msg) }
+    }
+
+    public func send(data: Array<UInt8>): Unit {
+        send(data, 0)
     }
 
     public func recv(): Array<UInt8> {
