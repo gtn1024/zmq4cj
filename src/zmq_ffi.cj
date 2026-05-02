@@ -102,6 +102,10 @@ struct ZmqMsg {
 
 foreign func zmq_msg_init(msg: CPointer<ZmqMsg>): Int32
 
+foreign func zmq_msg_init_size(msg: CPointer<ZmqMsg>, size: UIntNative): Int32
+
+foreign func zmq_msg_send(msg: CPointer<ZmqMsg>, s: CPointer<Unit>, flags: Int32): Int32
+
 foreign func zmq_msg_recv(msg: CPointer<ZmqMsg>, s: CPointer<Unit>, flags: Int32): Int32
 
 foreign func zmq_msg_close(msg: CPointer<ZmqMsg>): Int32

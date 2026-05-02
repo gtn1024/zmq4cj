@@ -1,7 +1,7 @@
 ## 1. FFI 层扩展
 
-- [ ] 1.1 在 `src/zmq_ffi.cj` 中新增 `zmq_msg_init_size(msg: CPointer<ZmqMsg>, size: UIntNative): Int32` 声明
-- [ ] 1.2 在 `src/zmq_ffi.cj` 中新增 `zmq_msg_send(msg: CPointer<ZmqMsg>, s: CPointer<Unit>, flags: Int32): Int32` 声明
+- [x] 1.1 在 `src/zmq_ffi.cj` 中新增 `zmq_msg_init_size(msg: CPointer<ZmqMsg>, size: UIntNative): Int32` 声明
+- [x] 1.2 在 `src/zmq_ffi.cj` 中新增 `zmq_msg_send(msg: CPointer<ZmqMsg>, s: CPointer<Unit>, flags: Int32): Int32` 声明
 
 ## 2. 枚举扩展
 
