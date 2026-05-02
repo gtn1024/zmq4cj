@@ -28,11 +28,11 @@
 
 ## 5. 上下文管理
 
-- [ ] 5.1 创建 `src/zmq_context.cj`，定义 `ZmqContext` 类（实现 Resource 接口）
-- [ ] 5.2 实现 `init()`，调用 zmq_ctx_new，失败时抛出 ZmqError
-- [ ] 5.3 实现 `close()`，调用 zmq_ctx_term，带幂等保护（null handle 检查）
-- [ ] 5.4 实现 `isClosed()`，检查 handle 是否为 null
-- [ ] 5.5 实现 `socket(type_: SocketType): ZmqSocket` 方法
+- [x] 5.1 创建 `src/zmq_context.cj`，定义 `ZmqContext` 类（实现 Resource 接口）
+- [x] 5.2 实现 `init()`，调用 zmq_ctx_new，失败时抛出 ZmqError
+- [x] 5.3 实现 `close()`，调用 zmq_ctx_term，带幂等保护（null handle 检查）
+- [x] 5.4 实现 `isClosed()`，检查 handle 是否为 null
+- [x] 5.5 实现 `socket(type_: SocketType): ZmqSocket` 方法
 
 ## 6. Socket 操作
 
