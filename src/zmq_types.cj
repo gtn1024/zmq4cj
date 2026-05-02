@@ -31,6 +31,7 @@ public enum SocketType {
 public enum SocketOption {
     | SUBSCRIBE
     | UNSUBSCRIBE
+    | RCVMORE
     | LINGER
     | SNDHWM
     | RCVHWM
@@ -42,6 +43,7 @@ public enum SocketOption {
             match (this) {
                 case SUBSCRIBE => 6
                 case UNSUBSCRIBE => 7
+                case RCVMORE => 13
                 case LINGER => 17
                 case SNDHWM => 23
                 case RCVHWM => 24

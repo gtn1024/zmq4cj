@@ -5,7 +5,7 @@
 
 ## 2. 枚举扩展
 
-- [ ] 2.1 在 `src/zmq_types.cj` 的 `SocketOption` 枚举中新增 `RCVMORE`（值为 13）
+- [x] 2.1 在 `src/zmq_types.cj` 的 `SocketOption` 枚举中新增 `RCVMORE`（值为 13）
 
 ## 3. Socket send 迁移与 flags 支持
 
