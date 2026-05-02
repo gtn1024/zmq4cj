@@ -1,0 +1,28 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install cmake (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake
+      - uses: Zxilly/setup-cangjie@v2
+        with:
+          channel: sts
+          version: 1.1.0
+      - name: build
+        shell: bash
+        run: cjpm build
+      - name: test
+        shell: bash
+        run: cjpm test
