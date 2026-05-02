@@ -36,14 +36,14 @@
 
 ## 6. Socket 操作
 
-- [ ] 6.1 创建 `src/zmq_socket.cj`，定义 `ZmqSocket` 类（实现 Resource 接口）
-- [ ] 6.2 实现 `close()`，调用 zmq_close，带幂等保护
-- [ ] 6.3 实现 `bind(addr: String)`，含 CString 转换和错误检查
-- [ ] 6.4 实现 `connect(addr: String)`，含 CString 转换和错误检查
-- [ ] 6.5 实现 `send(data: Array<UInt8>)`，含 CPointer 缓冲区转换
-- [ ] 6.6 实现 `recv(): Array<UInt8>`，含缓冲区分配和数据拷贝
-- [ ] 6.7 实现 `setSubscribe(topic: String)`，用于 SUB Socket（通过 zmq_setsockopt）
-- [ ] 6.8 创建 `src/zmq_common.cj`，包含内部 String↔CString 转换工具函数
+- [x] 6.1 创建 `src/zmq_socket.cj`，定义 `ZmqSocket` 类（实现 Resource 接口）
+- [x] 6.2 实现 `close()`，调用 zmq_close，带幂等保护
+- [x] 6.3 实现 `bind(addr: String)`，含 CString 转换和错误检查
+- [x] 6.4 实现 `connect(addr: String)`，含 CString 转换和错误检查
+- [x] 6.5 实现 `send(data: Array<UInt8>)`，含 CPointer 缓冲区转换
+- [x] 6.6 实现 `recv(): Array<UInt8>`，含缓冲区分配和数据拷贝
+- [x] 6.7 实现 `setSubscribe(topic: String)`，用于 SUB Socket（通过 zmq_setsockopt）
+- [x] 6.8 创建 `src/zmq_common.cj`，包含内部 String↔CString 转换工具函数
 
 ## 7. 通信模式测试
 
