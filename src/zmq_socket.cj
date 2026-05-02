@@ -97,7 +97,7 @@ public class ZmqSocket <: Resource {
 
     public func sendMultipart(frames: Array<Array<UInt8>>): Unit {
         if (frames.size == 0) {
-            throw Exception("sendMultipart requires at least one frame")
+            throw ZmqError(22)
         }
         var i: Int64 = 0
         while (i < frames.size - 1) {

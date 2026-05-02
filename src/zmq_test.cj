@@ -212,4 +212,52 @@ public class ZmqPatternTest {
         pull.close()
         ctx.close()
     }
+
+    @TestCase
+    func testMultipartEmptyFrame(): Unit {
+        let ctx = ZmqContext()
+        let pull = ctx.socket(SocketType.PULL)
+        let push = ctx.socket(SocketType.PUSH)
+
+        pull.bind("tcp://*:5563")
+        push.connect("tcp://localhost:5563")
+
+        sleep(Duration.millisecond * 100)
+
+        push.sendMultipart([
+            "header".toArray(),
+            Array<UInt8>()
+        ])
+
+        let frames = pull.recvMultipart()
+        @Assert(frames.size, 2)
+        @Assert(String.fromUtf8(frames[0]), "header")
+        @Assert(frames[1].size, 0)
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testRecvMultipartSingleFrame(): Unit {
+        let ctx = ZmqContext()
+        let pull = ctx.socket(SocketType.PULL)
+        let push = ctx.socket(SocketType.PUSH)
+
+        pull.bind("tcp://*:5564")
+        push.connect("tcp://localhost:5564")
+
+        sleep(Duration.millisecond * 100)
+
+        push.send("single".toArray())
+
+        let frames = pull.recvMultipart()
+        @Assert(frames.size, 1)
+        @Assert(String.fromUtf8(frames[0]), "single")
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
 }
