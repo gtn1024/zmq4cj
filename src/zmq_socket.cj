@@ -79,6 +79,20 @@ public class ZmqSocket <: Resource {
         recv(0)
     }
 
+    public func hasReceiveMore(): Bool {
+        var more: Int32 = 0
+        unsafe {
+            let morePtr = LibC.malloc<Int32>(count: 1)
+            let sizePtr = LibC.malloc<UIntNative>(count: 1)
+            (sizePtr + 0).write(UIntNative(4))
+            zmq_getsockopt(handle, SocketOption.RCVMORE.value, CPointer<Unit>(morePtr), sizePtr)
+            more = (morePtr + 0).read()
+            LibC.free(morePtr)
+            LibC.free(sizePtr)
+        }
+        more == 1
+    }
+
     public func setSubscribe(topic: String): Unit {
         let bytes = topic.toArray()
         let buf = unsafe { LibC.malloc<UInt8>(count: bytes.size) }

@@ -19,7 +19,7 @@
 
 ## 5. hasReceiveMore 方法
 
-- [ ] 5.1 实现 `ZmqSocket.hasReceiveMore(): Bool`，内部调用 `zmq_getsockopt` 查询 `ZMQ_RCVMORE`（SocketOption.RCVMORE.value = 13）
+- [x] 5.1 实现 `ZmqSocket.hasReceiveMore(): Bool`，内部调用 `zmq_getsockopt` 查询 `ZMQ_RCVMORE`（SocketOption.RCVMORE.value = 13）
 
 ## 6. Multipart 便捷方法
 
