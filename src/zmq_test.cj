@@ -47,14 +47,59 @@ public class ZmqPatternTest {
 
         sleep(Duration.millisecond * 200)
 
-        pub.send("weather.temp=25".toArray())
         pub.send("news.headline=...".toArray())
+        pub.send("weather.temp=25".toArray())
 
         let msg = sub.recv()
         @Assert(String.fromUtf8(msg), "weather.temp=25")
 
         pub.close()
         sub.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testDealerRouter(): Unit {
+        let ctx = ZmqContext()
+        let router = ctx.socket(SocketType.ROUTER)
+        let dealer = ctx.socket(SocketType.DEALER)
+
+        router.bind("tcp://*:5558")
+        dealer.connect("tcp://localhost:5558")
+
+        sleep(Duration.millisecond * 100)
+
+        dealer.send("message".toArray())
+
+        let identity = router.recv()
+        let body = router.recv()
+        @Assert(String.fromUtf8(body), "message")
+        @Assert(identity.size > 0, true)
+
+        dealer.close()
+        router.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testPair(): Unit {
+        let ctx = ZmqContext()
+        let pairA = ctx.socket(SocketType.PAIR)
+        let pairB = ctx.socket(SocketType.PAIR)
+
+        pairA.bind("inproc://pair-test")
+        pairB.connect("inproc://pair-test")
+
+        pairA.send("ping".toArray())
+        let msgB = pairB.recv()
+        @Assert(String.fromUtf8(msgB), "ping")
+
+        pairB.send("pong".toArray())
+        let msgA = pairA.recv()
+        @Assert(String.fromUtf8(msgA), "pong")
+
+        pairA.close()
+        pairB.close()
         ctx.close()
     }
 

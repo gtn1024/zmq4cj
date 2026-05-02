@@ -47,15 +47,20 @@ public class ZmqSocket <: Resource {
     }
 
     public func recv(): Array<UInt8> {
-        let bufSize: Int64 = 65536
-        let buf = unsafe { LibC.malloc<UInt8>(count: bufSize) }
-        let rc = unsafe { zmq_recv(handle, CPointer<Unit>(buf), UIntNative(bufSize), 0) }
+        let msg = unsafe { LibC.malloc<ZmqMsg>(count: 1) }
+        unsafe { zmq_msg_init(msg) }
+        let rc = unsafe { zmq_msg_recv(msg, handle, 0) }
         if (rc == -1) {
-            unsafe { LibC.free(buf) }
+            unsafe { zmq_msg_close(msg) }
+            unsafe { LibC.free(msg) }
             throw ZmqError(unsafe { zmq_errno() })
         }
-        let result = copyCPointerToArray(buf, Int64(rc))
-        unsafe { LibC.free(buf) }
+        let size = unsafe { zmq_msg_size(msg) }
+        let data = unsafe { zmq_msg_data(msg) }
+        let dataPtr = unsafe { CPointer<UInt8>(data) }
+        let result = copyCPointerToArray(dataPtr, Int64(size))
+        unsafe { zmq_msg_close(msg) }
+        unsafe { LibC.free(msg) }
         result
     }
 
