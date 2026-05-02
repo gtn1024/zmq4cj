@@ -1,0 +1,3 @@
+[submodule "docs/cangjie_docs"]
+	path = docs/cangjie_docs
+	url = https://gitcode.com/Cangjie/cangjie_docs.git
