@@ -54,6 +54,6 @@
 
 ## 8. 文档
 
-- [ ] 8.1 编写 README，包含项目简介、构建说明、平台前置条件（cmake、C 编译器）
-- [ ] 8.2 在 README 中添加 REQ/REP 快速入门示例代码
-- [ ] 8.3 在 README 中添加 API 概览（ZmqContext、ZmqSocket、SocketType、ZmqError）
+- [x] 8.1 编写 README，包含项目简介、构建说明、平台前置条件（cmake、C 编译器）
+- [x] 8.2 在 README 中添加 REQ/REP 快速入门示例代码
+- [x] 8.3 在 README 中添加 API 概览（ZmqContext、ZmqSocket、SocketType、ZmqError）
