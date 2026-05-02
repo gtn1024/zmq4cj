@@ -23,8 +23,8 @@
 
 ## 6. Multipart 便捷方法
 
-- [ ] 6.1 实现 `ZmqSocket.sendMultipart(frames: Array<Array<UInt8>>)`：遍历 frames，前 N-1 帧调用 `send(frame, SendRecvFlags.SNDMORE.value)`，最后一帧调用 `send(frame, 0)`
-- [ ] 6.2 实现 `ZmqSocket.recvMultipart(): Array<Array<UInt8>>`：先 `recv(0)` 收第一帧，然后 `while (hasReceiveMore())` 循环收后续帧，收集为 Array 返回
+- [x] 6.1 实现 `ZmqSocket.sendMultipart(frames: Array<Array<UInt8>>)`：遍历 frames，前 N-1 帧调用 `send(frame, SendRecvFlags.SNDMORE.value)`，最后一帧调用 `send(frame, 0)`
+- [x] 6.2 实现 `ZmqSocket.recvMultipart(): Array<Array<UInt8>>`：先 `recv(0)` 收第一帧，然后 `while (hasReceiveMore())` 循环收后续帧，收集为 Array 返回
 
 ## 7. 测试
 

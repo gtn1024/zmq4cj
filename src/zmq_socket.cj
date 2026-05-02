@@ -1,5 +1,7 @@
 package zmq4cj
 
+import std.collection.ArrayList
+
 public class ZmqSocket <: Resource {
     var handle: CPointer<Unit>
 
@@ -91,6 +93,27 @@ public class ZmqSocket <: Resource {
             LibC.free(sizePtr)
         }
         more == 1
+    }
+
+    public func sendMultipart(frames: Array<Array<UInt8>>): Unit {
+        if (frames.size == 0) {
+            throw ZmqError(-1, "sendMultipart requires at least one frame")
+        }
+        var i: Int64 = 0
+        while (i < frames.size - 1) {
+            send(frames[i], SendRecvFlags.SNDMORE.value)
+            i++
+        }
+        send(frames[frames.size - 1])
+    }
+
+    public func recvMultipart(): Array<Array<UInt8>> {
+        let frames = ArrayList<Array<UInt8>>()
+        frames.append(recv(0))
+        while (hasReceiveMore()) {
+            frames.append(recv(0))
+        }
+        frames.toArray()
     }
 
     public func setSubscribe(topic: String): Unit {
