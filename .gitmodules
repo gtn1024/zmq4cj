@@ -1,3 +1,6 @@
 [submodule "docs/cangjie_docs"]
 	path = docs/cangjie_docs
 	url = https://gitcode.com/Cangjie/cangjie_docs.git
+[submodule "vendor/libzmq"]
+	path = vendor/libzmq
+	url = https://github.com/zeromq/libzmq.git

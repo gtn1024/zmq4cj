@@ -15,3 +15,8 @@ reports/
 # Misc
 tmp*
 .DS_Store
+
+# libzmq build artifacts
+vendor/build/
+
+build-script-cache/

@@ -1,10 +1,10 @@
 ## 1. 构建系统搭建
 
-- [ ] 1.1 将 libzmq 作为 git submodule 添加到 `vendor/libzmq/`
-- [ ] 1.2 创建 `build.cj`，在 `pre-build` 钩子中从源码编译 libzmq（cmake + make）
-- [ ] 1.3 配置 `cjpm.toml`，设置 `[ffi.c]` 和各平台的 `[target.*.ffi.c]` 路径
-- [ ] 1.4 将 `vendor/build/` 添加到 `.gitignore`
-- [ ] 1.5 验证 `cjpm build` 能成功编译 libzmq.a 并链接
+- [x] 1.1 将 libzmq 作为 git submodule 添加到 `vendor/libzmq/`
+- [x] 1.2 创建 `build.cj`，在 `pre-build` 钩子中从源码编译 libzmq（cmake + make）
+- [x] 1.3 配置 `cjpm.toml`，设置 `[ffi.c]` 和各平台的 `[target.*.ffi.c]` 路径
+- [x] 1.4 将 `vendor/build/` 添加到 `.gitignore`
+- [x] 1.5 验证 `cjpm build` 能成功编译 libzmq.a 并链接
 
 ## 2. FFI 声明
 

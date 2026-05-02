@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "zmq4cj"
   organization = ""
-  description = "nothing here"
+  description = "ZeroMQ bindings for Cangjie"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""
@@ -13,3 +13,18 @@
   package-configuration = {}
 
 [dependencies]
+
+[target.x86_64-unknown-linux-gnu.ffi.c]
+zmq = { path = "vendor/build/linux/lib" }
+
+[target.aarch64-unknown-linux-gnu.ffi.c]
+zmq = { path = "vendor/build/linux/lib" }
+
+[target.x86_64-apple-darwin.ffi.c]
+zmq = { path = "vendor/build/darwin/lib" }
+
+[target.aarch64-apple-darwin.ffi.c]
+zmq = { path = "vendor/build/darwin/lib" }
+
+[target.x86_64-windows-gnu.ffi.c]
+zmq = { path = "vendor/build/windows/lib" }
