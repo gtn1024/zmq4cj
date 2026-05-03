@@ -216,6 +216,9 @@ if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
 | 6 | `ROUTER` | Router（高级请求/应答模式） |
 | 7 | `PULL` | 拉取（管道接收端） |
 | 8 | `PUSH` | 推送（管道发送端） |
+| 9 | `XPUB` | 扩展发布者（类似 PUB，可接收订阅消息） |
+| 10 | `XSUB` | 扩展订阅者（类似 SUB，可发送订阅给 PUB） |
+| 11 | `STREAM` | 流式 Socket（原始 TCP 收发） |
 
 ### SendRecvFlags
 

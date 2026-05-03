@@ -10,6 +10,9 @@ public enum SocketType {
     | ROUTER
     | PULL
     | PUSH
+    | XPUB
+    | XSUB
+    | STREAM
 
     public prop value: Int32 {
         get() {
@@ -23,6 +26,9 @@ public enum SocketType {
                 case ROUTER => 6
                 case PULL => 7
                 case PUSH => 8
+                case XPUB => 9
+                case XSUB => 10
+                case STREAM => 11
             }
         }
     }

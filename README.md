@@ -216,6 +216,9 @@ Represents a ZMQ socket. Implements `Resource` for `try-with-resources`.
 | 6 | `ROUTER` | Router (advanced request/reply pattern) |
 | 7 | `PULL` | Pull (receives messages from pipeline) |
 | 8 | `PUSH` | Push (sends messages to pipeline) |
+| 9 | `XPUB` | Extended Publisher (like PUB but can receive subscriptions) |
+| 10 | `XSUB` | Extended Subscriber (like SUB but can send subscriptions to PUB) |
+| 11 | `STREAM` | Stream (raw TCP send/receive) |
 
 ### SendRecvFlags
 

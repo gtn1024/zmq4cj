@@ -547,4 +547,46 @@ public class ZmqPatternTest {
         pull2.close()
         ctx.close()
     }
+
+    @TestCase
+    func testXpubXsub(): Unit {
+        let ctx = ZmqContext()
+        let xpub = ctx.socket(SocketType.XPUB)
+        let sub = ctx.socket(SocketType.SUB)
+
+        xpub.bind("tcp://*:5590")
+        sub.connect("tcp://localhost:5590")
+
+        sleep(Duration.millisecond * 200)
+
+        sub.setSubscribe("weather.")
+        sleep(Duration.millisecond * 100)
+
+        let subMsg = xpub.recv()
+        let subCmd = Array<UInt8>(1 + "weather.".size, {i: Int64 =>
+            if (i == 0) { UInt8(1) } else { "weather.".toArray()[Int64(i - 1)] }
+        })
+        @Assert(subMsg[0], UInt8(1))
+        @Assert(String.fromUtf8(Array<UInt8>(subMsg.size - 1, {i: Int64 => subMsg[Int64(i + 1)]})), "weather.")
+
+        xpub.send("weather.london: rain, 15C".toArray())
+        sleep(Duration.millisecond * 100)
+
+        let msg = sub.recv()
+        @Assert(String.fromUtf8(msg), "weather.london: rain, 15C")
+
+        xpub.close()
+        sub.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testStreamSocket(): Unit {
+        let ctx = ZmqContext()
+        let stream = ctx.socket(SocketType.STREAM)
+        stream.bind("tcp://*:5591")
+        @Assert(stream.isClosed(), false)
+        stream.close()
+        ctx.close()
+    }
 }
