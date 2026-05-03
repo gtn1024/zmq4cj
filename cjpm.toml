@@ -26,14 +26,15 @@ zmq = { path = "vendor/build/linux/lib" }
 [target.aarch64-unknown-linux-gnu.ffi.c]
 zmq = { path = "vendor/build/linux/lib" }
 
+[target.x86_64-apple-darwin]
+  link-option = "-lc++"
+
 [target.x86_64-apple-darwin.ffi.c]
 zmq = { path = "vendor/build/darwin/lib" }
+
+[target.aarch64-apple-darwin]
+  link-option = "-lc++"
 
 [target.aarch64-apple-darwin.ffi.c]
 zmq = { path = "vendor/build/darwin/lib" }
 
-[target.x86_64-windows-gnu]
-  link-option = "-lstdc++"
-
-[target.x86_64-windows-gnu.ffi.c]
-zmq = { path = "vendor/build/windows/lib" }
