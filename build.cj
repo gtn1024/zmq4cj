@@ -77,7 +77,7 @@ func getCmakeExtraFlags(): String {
 
 @When[os == "Windows"]
 func getCmakeExtraFlags(): String {
-    " -DCMAKE_CXX_FLAGS=\"-static-libstdc++ -static-libgcc\""
+    " \"-DCMAKE_CXX_FLAGS=-static-libstdc++ -static-libgcc\" \"-DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ -static-libgcc\""
 }
 
 func stagePreBuild(): Int64 {
