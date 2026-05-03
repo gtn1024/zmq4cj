@@ -42,17 +42,16 @@ public class ZmqSocket <: Resource {
     }
 
     public func send(data: Array<UInt8>, flags: Int32): Unit {
-        var msg = ZmqMsg()
-        unsafe { checkResult(zmq_msg_init_size(CPointer<ZmqMsg>(inout msg), UIntNative(data.size))) }
-        let dataPtr = unsafe { CPointer<UInt8>(zmq_msg_data(CPointer<ZmqMsg>(inout msg))) }
-        copyArrayToCPointer(data, dataPtr)
-        let rc = unsafe { zmq_msg_send(CPointer<ZmqMsg>(inout msg), handle, flags) }
-        if (rc == -1) {
-            let err = unsafe { zmq_errno() }
-            unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
-            throw ZmqError(err)
+        if (data.size == 0) {
+            unsafe { checkResult(zmq_send(handle, CPointer<Unit>(), UIntNative(0), flags)) }
+            return
         }
-        unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
+        unsafe {
+            let handle2 = acquireArrayRawData<UInt8>(data)
+            let rc = zmq_send(handle, CPointer<Unit>(handle2.pointer), UIntNative(data.size), flags)
+            releaseArrayRawData<UInt8>(handle2)
+            checkResult(rc)
+        }
     }
 
     public func send(data: Array<UInt8>): Unit {
