@@ -406,4 +406,74 @@ public class ZmqPatternTest {
         pull.close()
         ctx.close()
     }
+
+    @TestCase
+    func testSetGetIntOption(): Unit {
+        let ctx = ZmqContext()
+        let sock = ctx.socket(SocketType.REQ)
+
+        sock.setIntOption(SocketOption.LINGER, 0)
+        let linger = sock.getIntOption(SocketOption.LINGER)
+        @Assert(linger, 0)
+
+        sock.setIntOption(SocketOption.LINGER, 100)
+        let linger2 = sock.getIntOption(SocketOption.LINGER)
+        @Assert(linger2, 100)
+
+        sock.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testRcvTimeout(): Unit {
+        let ctx = ZmqContext()
+        let rep = ctx.socket(SocketType.REP)
+        let req = ctx.socket(SocketType.REQ)
+
+        rep.bind("tcp://*:5570")
+        req.connect("tcp://localhost:5570")
+
+        req.setIntOption(SocketOption.RCVTIMEO, 100)
+
+        var timedOut = false
+        try {
+            req.recv()
+        } catch (e: ZmqError) {
+            timedOut = true
+        }
+        @Assert(timedOut, true)
+
+        req.close()
+        rep.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testUnsubscribe(): Unit {
+        let ctx = ZmqContext()
+        let pub = ctx.socket(SocketType.PUB)
+        let sub = ctx.socket(SocketType.SUB)
+
+        pub.bind("tcp://*:5571")
+        sub.connect("tcp://localhost:5571")
+        sub.setSubscribe("")
+        sub.setStringOption(SocketOption.UNSUBSCRIBE, "")
+
+        sleep(Duration.millisecond * 100)
+
+        pub.send("should-not-receive".toArray())
+
+        sub.setIntOption(SocketOption.RCVTIMEO, 200)
+        var received = false
+        try {
+            sub.recv()
+            received = true
+        } catch (_: ZmqError) {
+        }
+        @Assert(received, false)
+
+        pub.close()
+        sub.close()
+        ctx.close()
+    }
 }

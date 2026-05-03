@@ -109,13 +109,32 @@ public class ZmqSocket <: Resource {
         frames.toArray()
     }
 
-    public func setSubscribe(topic: String): Unit {
-        let bytes = topic.toArray()
-        let buf = unsafe { LibC.malloc<UInt8>(count: bytes.size) }
-        copyArrayToCPointer(bytes, buf)
+    public func setIntOption(option: SocketOption, value: Int32): Unit {
+        var val = value
+        var size = UIntNative(4)
         unsafe {
-            checkResult(zmq_setsockopt(handle, SocketOption.SUBSCRIBE.value, CPointer<Unit>(buf), UIntNative(bytes.size)))
+            checkResult(zmq_setsockopt(handle, option.value, CPointer<Unit>(CPointer<Int32>(inout val)), size))
         }
-        unsafe { LibC.free(buf) }
+    }
+
+    public func getIntOption(option: SocketOption): Int32 {
+        var val: Int32 = 0
+        var size = UIntNative(4)
+        unsafe {
+            checkResult(zmq_getsockopt(handle, option.value, CPointer<Unit>(CPointer<Int32>(inout val)), CPointer<UIntNative>(inout size)))
+        }
+        val
+    }
+
+    public func setStringOption(option: SocketOption, value: String): Unit {
+        let cs = stringToCString(value)
+        unsafe {
+            checkResult(zmq_setsockopt(handle, option.value, CPointer<Unit>(cs.getChars()), UIntNative(value.size)))
+        }
+        freeCString(cs)
+    }
+
+    public func setSubscribe(topic: String): Unit {
+        setStringOption(SocketOption.SUBSCRIBE, topic)
     }
 }
