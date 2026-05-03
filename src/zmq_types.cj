@@ -67,3 +67,19 @@ public enum SendRecvFlags {
         }
     }
 }
+
+public enum PollEvent {
+    | POLLIN
+    | POLLOUT
+    | POLLERR
+
+    public prop value: Int16 {
+        get() {
+            match (this) {
+                case POLLIN => 1
+                case POLLOUT => 2
+                case POLLERR => 4
+            }
+        }
+    }
+}

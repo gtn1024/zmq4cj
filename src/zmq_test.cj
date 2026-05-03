@@ -2,8 +2,8 @@ package zmq4cj
 
 import std.unittest.*
 import std.unittest.testmacro.*
-import std.time.*
 import std.sync.SyncCounter
+import std.collection.ArrayList
 
 @Test
 public class ZmqPatternTest {
@@ -474,6 +474,77 @@ public class ZmqPatternTest {
 
         pub.close()
         sub.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testPollSingleSocket(): Unit {
+        let ctx = ZmqContext()
+        let push = ctx.socket(SocketType.PUSH)
+        let pull = ctx.socket(SocketType.PULL)
+
+        push.bind("tcp://*:5580")
+        pull.connect("tcp://localhost:5580")
+
+        push.send("hello".toArray())
+
+        sleep(Duration.millisecond * 100)
+
+        let list = ArrayList<PollItem>()
+        list.add(PollItem(pull, PollEvent.POLLIN.value))
+        let rc = ZmqPoll.poll(list.toArray(), 1000)
+        @Assert(rc, 1)
+        @Assert((list[0].revents & PollEvent.POLLIN.value) != Int16(0), true)
+
+        let msg = pull.recv()
+        @Assert(String.fromUtf8(msg), "hello")
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testPollTimeout(): Unit {
+        let ctx = ZmqContext()
+        let pull = ctx.socket(SocketType.PULL)
+        pull.bind("tcp://*:5581")
+
+        let list = ArrayList<PollItem>()
+        list.add(PollItem(pull, PollEvent.POLLIN.value))
+        let rc = ZmqPoll.poll(list.toArray(), 100)
+        @Assert(rc, 0)
+        @Assert(list[0].revents, Int16(0))
+
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testPollMultipleSockets(): Unit {
+        let ctx = ZmqContext()
+        let push1 = ctx.socket(SocketType.PUSH)
+        let pull1 = ctx.socket(SocketType.PULL)
+        let pull2 = ctx.socket(SocketType.PULL)
+
+        push1.bind("tcp://*:5582")
+        pull1.connect("tcp://localhost:5582")
+        pull2.bind("tcp://*:5583")
+
+        push1.send("msg1".toArray())
+        sleep(Duration.millisecond * 100)
+
+        let list = ArrayList<PollItem>()
+        list.add(PollItem(pull1, PollEvent.POLLIN.value))
+        list.add(PollItem(pull2, PollEvent.POLLIN.value))
+        let rc = ZmqPoll.poll(list.toArray(), 1000)
+        @Assert(rc, 1)
+        @Assert((list[0].revents & PollEvent.POLLIN.value) != Int16(0), true)
+        @Assert(list[1].revents, Int16(0))
+
+        push1.close()
+        pull1.close()
+        pull2.close()
         ctx.close()
     }
 }
