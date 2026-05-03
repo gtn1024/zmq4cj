@@ -67,12 +67,12 @@ func getCmakeGenerator(): String {
 
 @When[os == "Linux"]
 func getCmakeExtraFlags(): String {
-    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC"
+    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_TLS=OFF"
 }
 
 @When[os == "macOS"]
 func getCmakeExtraFlags(): String {
-    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_GNUTLS=OFF"
+    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_TLS=OFF"
 }
 
 @When[os == "Windows"]
@@ -84,6 +84,8 @@ func getCmakeExtraFlags(): String {
 func copyGccLibs(libDir: String): Unit {
     runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libstdc++.a ${libDir}/\"")
     runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libgcc.a ${libDir}/\"")
+    runCmd("bash -c \"cp C:/mingw64/x86_64-w64-mingw32/lib/libwinpthread.a ${libDir}/ 2>/dev/null || true\"")
+    runCmd("bash -c \"cp C:/mingw64/x86_64-w64-mingw32/lib/libmingwex.a ${libDir}/ 2>/dev/null || true\"")
     println("Copied GCC runtime libs to ${libDir}")
 }
 
