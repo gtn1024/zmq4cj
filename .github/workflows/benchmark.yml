@@ -1,0 +1,61 @@
+name: benchmark
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install cmake
+        run: sudo apt-get update && sudo apt-get install -y cmake
+      - uses: Zxilly/setup-cangjie@v2
+        with:
+          channel: sts
+          version: 1.1.0
+      - name: Build main library
+        run: cjpm build
+      - name: Run benchmark
+        working-directory: benchmark
+        run: cjpm run 2>&1 | tee ../benchmark_result.txt
+      - name: Comment benchmark results on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const result = fs.readFileSync('benchmark_result.txt', 'utf8');
+            const body = `## Benchmark Results\n\n\`\`\`\n${result}\n\`\`\`\n\n*Triggered by commit ${context.sha.substring(0, 7)}*`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(c =>
+              c.user.login === 'github-actions[bot]' && c.body.startsWith('## Benchmark Results')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
