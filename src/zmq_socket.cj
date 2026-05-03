@@ -42,19 +42,17 @@ public class ZmqSocket <: Resource {
     }
 
     public func send(data: Array<UInt8>, flags: Int32): Unit {
-        let msg = unsafe { LibC.malloc<ZmqMsg>(count: 1) }
-        unsafe { checkResult(zmq_msg_init_size(msg, UIntNative(data.size))) }
-        let dataPtr = unsafe { CPointer<UInt8>(zmq_msg_data(msg)) }
+        var msg = ZmqMsg()
+        unsafe { checkResult(zmq_msg_init_size(CPointer<ZmqMsg>(inout msg), UIntNative(data.size))) }
+        let dataPtr = unsafe { CPointer<UInt8>(zmq_msg_data(CPointer<ZmqMsg>(inout msg))) }
         copyArrayToCPointer(data, dataPtr)
-        let rc = unsafe { zmq_msg_send(msg, handle, flags) }
+        let rc = unsafe { zmq_msg_send(CPointer<ZmqMsg>(inout msg), handle, flags) }
         if (rc == -1) {
             let err = unsafe { zmq_errno() }
-            unsafe { zmq_msg_close(msg) }
-            unsafe { LibC.free(msg) }
+            unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
             throw ZmqError(err)
         }
-        unsafe { zmq_msg_close(msg) }
-        unsafe { LibC.free(msg) }
+        unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
     }
 
     public func send(data: Array<UInt8>): Unit {
@@ -62,20 +60,18 @@ public class ZmqSocket <: Resource {
     }
 
     public func recv(flags: Int32): Array<UInt8> {
-        let msg = unsafe { LibC.malloc<ZmqMsg>(count: 1) }
-        unsafe { zmq_msg_init(msg) }
-        let rc = unsafe { zmq_msg_recv(msg, handle, flags) }
+        var msg = ZmqMsg()
+        unsafe { zmq_msg_init(CPointer<ZmqMsg>(inout msg)) }
+        let rc = unsafe { zmq_msg_recv(CPointer<ZmqMsg>(inout msg), handle, flags) }
         if (rc == -1) {
-            unsafe { zmq_msg_close(msg) }
-            unsafe { LibC.free(msg) }
+            unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
             throw ZmqError(unsafe { zmq_errno() })
         }
-        let size = unsafe { zmq_msg_size(msg) }
-        let data = unsafe { zmq_msg_data(msg) }
+        let size = unsafe { zmq_msg_size(CPointer<ZmqMsg>(inout msg)) }
+        let data = unsafe { zmq_msg_data(CPointer<ZmqMsg>(inout msg)) }
         let dataPtr = unsafe { CPointer<UInt8>(data) }
         let result = copyCPointerToArray(dataPtr, Int64(size))
-        unsafe { zmq_msg_close(msg) }
-        unsafe { LibC.free(msg) }
+        unsafe { zmq_msg_close(CPointer<ZmqMsg>(inout msg)) }
         result
     }
 
@@ -85,14 +81,10 @@ public class ZmqSocket <: Resource {
 
     public func hasReceiveMore(): Bool {
         var more: Int32 = 0
+        var size: UIntNative = UIntNative(4)
         unsafe {
-            let morePtr = LibC.malloc<Int32>(count: 1)
-            let sizePtr = LibC.malloc<UIntNative>(count: 1)
-            (sizePtr + 0).write(UIntNative(4))
-            zmq_getsockopt(handle, SocketOption.RCVMORE.value, CPointer<Unit>(morePtr), sizePtr)
-            more = (morePtr + 0).read()
-            LibC.free(morePtr)
-            LibC.free(sizePtr)
+            zmq_getsockopt(handle, SocketOption.RCVMORE.value, CPointer<Unit>(CPointer<Int32>(inout more)), CPointer<UIntNative>(inout size))
+            more = more
         }
         more == 1
     }
