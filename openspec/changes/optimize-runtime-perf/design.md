@@ -23,9 +23,9 @@ zmq4cj 通过 FFI 封装 libzmq。当前 `ZmqSocket` 的 `send()`/`recv()` 实�
 
 ### 1. 使用 `@C struct` 值栈分配 ZmqMsg
 
-**决策**：将 `ZmqMsg` 声明为局部变量（栈分配的 `@C struct`），替代 `LibC.malloc<ZmqMsg>`。
+**决策**：将 `ZmqMsg` 声明为局部变量（栈分配的 `@C struct`），替代 `LibC.malloc<ZmqMsg>`。通过 `CPointer<ZmqMsg>(inout msg)` 取地址。
 
-**理由**：`ZmqMsg` 仅 64 字节，轻松放入栈帧。仓颉的 `@C struct` 内存布局与 C 结构体完全一致。取 `&msg` 可得到适用于 FFI 调用的 `CPointer<ZmqMsg>`。这消除了每条消息 2 次堆操作（malloc + free）。
+**理由**：`ZmqMsg` 仅 64 字节，轻松放入栈帧。仓颉的 `@C struct` 内存布局与 C 结构体完全一致。`inout` 关键字可获取 `var` 局部变量的指针，得到适用于 FFI 调用的 `CPointer<ZmqMsg>`。这消除了每条消息 2 次堆操作（malloc + free）。
 
 **备选方案**：对象池分配 — 对 64 字节固定大小结构体来说不必要地复杂。
 
@@ -35,7 +35,7 @@ zmq4cj 通过 FFI 封装 libzmq。当前 `ZmqSocket` 的 `send()`/`recv()` 实�
 
 **理由**：逐字节循环有 O(n) 次单独的指针操作。`memcpy` 在 libc 中经过高度优化（SIMD、字对齐）。对于 64KB 消息，这可能意味着从约 40 MB/s 提升到约 1 GB/s。
 
-**实现细节**：需要验证仓颉 `Array<UInt8>` 的内存布局是否连续。如果不保证连续，则 `Array → CPointer` 方向保留循环，仅优化 `CPointer → Array` 方向（因为 `zmq_msg_data` 返回的是连续 C 缓冲区）。
+**实现细节**：仓颉 `Array<UInt8>` 的内部 `RawArray` 不直接暴露，但标准库提供了 `std.core.acquireArrayRawData<T>(arr)` 函数（`T <: CType` 约束），返回 `CPointerHandle<T>`，其 `.pointer` 属性即为底层数据的 `CPointer<T>`。使用后需调用 `releaseArrayRawData(handle)` 释放。通过此 API 可在 `Array → CPointer` 和 `CPointer → Array` 两个方向上都使用 `memcpy` 批量传输。
 
 ### 3. 在 `hasReceiveMore()` 中使用栈变量
 
@@ -45,5 +45,5 @@ zmq4cj 通过 FFI 封装 libzmq。当前 `ZmqSocket` 的 `send()`/`recv()` 实�
 
 ## 风险与权衡
 
-- **[Array 连续性]** 仓颉 `Array<T>` 的内部布局可能不是连续的 C 兼容缓冲区 → **缓解**：双向测试；如果不连续，仅优化 `CPointer → Array` 方向，`Array → CPointer` 方向保留循环。
+- **[Array 连续性]** 仓颉 `Array<T>` 的内部布局不是直接暴露的 → **已解决**：通过 `std.core.acquireArrayRawData` 获取底层数据指针，两个方向均可用 `memcpy`。
 - **[栈 ZmqMsg 生命周期]** 必须确保 `ZmqMsg` 引用不会逃逸出函数 → **缓解**：ZmqMsg 仅在函数体内使用，通过指针传给 FFI 调用，不会被存储。
