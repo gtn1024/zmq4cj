@@ -60,15 +60,15 @@
 - **则** 在拷贝数据前分配 `zmq_msg_size()` 字节的缓冲区
 
 ### 需求：ZmqSocket 订阅设置
-系统应当为 SUB Socket 提供 `setSubscribe(topic: String): Unit` 方法。
+系统应当为 SUB Socket 提供 `setSubscribe(topic: String): Unit` 方法，内部委托给 `setStringOption(SocketOption.SUBSCRIBE, topic)`。
 
 #### 场景：订阅所有消息
-- **当** 在 SUB Socket 上调用 `socket.setSubscribe("")` 时
-- **则** 使用 ZMQ_SUBSCRIBE 和空主题调用 `zmq_setsockopt`
+- **WHEN** 在 SUB Socket 上调用 `socket.setSubscribe("")`
+- **THEN** 通过 `setStringOption` 设置 ZMQ_SUBSCRIBE 和空主题
 
 #### 场景：订阅特定主题
-- **当** 在 SUB Socket 上调用 `socket.setSubscribe("weather.")` 时
-- **则** 使用 ZMQ_SUBSCRIBE 和主题 "weather." 调用 `zmq_setsockopt`
+- **WHEN** 在 SUB Socket 上调用 `socket.setSubscribe("weather.")`
+- **THEN** 通过 `setStringOption` 设置 ZMQ_SUBSCRIBE 和主题 "weather."
 
 ### 需求：send 方法使用 zmq_send 实现
 系统应当将 `send(data: Array<UInt8>, flags: Int32)` 的内部实现使用 `zmq_send` API，结合 `acquireArrayRawData` 获取 Array 底层数据指针，保持外部签名不变。
