@@ -1,7 +1,7 @@
 package zmq4cj_build_script
 
 import std.process.*
-import std.fs.exists
+import std.fs.{exists, Directory}
 
 foreign func system(cmd: CString): Int32
 
@@ -32,7 +32,7 @@ func getLibName(): String {
 
 @When[os == "Windows"]
 func getLibName(): String {
-    "zmq.lib"
+    "libzmq.a"
 }
 
 func runCmd(cmd: String): Int32 {
@@ -42,6 +42,42 @@ func runCmd(cmd: String): Int32 {
         LibC.free(cCmd)
         rc
     }
+}
+
+func ensureDir(path: String): Unit {
+    if (!exists(path)) {
+        Directory.create(path, recursive: true)
+    }
+}
+
+@When[os == "Linux"]
+func getCmakeGenerator(): String {
+    ""
+}
+
+@When[os == "macOS"]
+func getCmakeGenerator(): String {
+    ""
+}
+
+@When[os == "Windows"]
+func getCmakeGenerator(): String {
+    " -G \"MinGW Makefiles\""
+}
+
+@When[os == "Linux"]
+func getCmakeExtraFlags(): String {
+    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC"
+}
+
+@When[os == "macOS"]
+func getCmakeExtraFlags(): String {
+    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC"
+}
+
+@When[os == "Windows"]
+func getCmakeExtraFlags(): String {
+    ""
 }
 
 func stagePreBuild(): Int64 {
@@ -59,11 +95,11 @@ func stagePreBuild(): Int64 {
         return 1
     }
 
-    runCmd("mkdir -p ${buildDir}")
+    ensureDir(buildDir)
 
     println("Building libzmq for ${platform}...")
 
-    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC"
+    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF${getCmakeGenerator()}${getCmakeExtraFlags()}"
     let cmakeRc = runCmd(cmakeCmd)
     if (cmakeRc != 0) {
         println("ERROR: cmake failed with return code ${cmakeRc}")
