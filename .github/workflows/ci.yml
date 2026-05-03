@@ -23,9 +23,12 @@ jobs:
       - name: build
         shell: bash
         run: cjpm build
-      - name: debug list vendor/build
+      - name: debug info
         shell: bash
-        run: find vendor/build -type f -name '*.a' -o -name '*.lib' 2>/dev/null || ls -R vendor/build/ 2>/dev/null || echo "no vendor/build"
+        run: |
+          cjpm build -V 2>&1 | grep -i target || true
+          find vendor/build -type f \( -name '*.a' -o -name '*.lib' \) 2>/dev/null || echo "no lib found"
+          ls target/release/zmq4cj/ 2>/dev/null || true
       - name: test
         shell: bash
         run: cjpm test
