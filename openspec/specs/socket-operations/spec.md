@@ -70,20 +70,24 @@
 - **当** 在 SUB Socket 上调用 `socket.setSubscribe("weather.")` 时
 - **则** 使用 ZMQ_SUBSCRIBE 和主题 "weather." 调用 `zmq_setsockopt`
 
-### 需求：send 方法迁移到 zmq_msg_send
-系统应当将 `send(data: Array<UInt8>)` 的内部实现从 `zmq_send` 迁移到 `zmq_msg_init_size` + `zmq_msg_send` + `zmq_msg_close`，保持外部签名不变。
+### 需求：send 方法使用 zmq_send 实现
+系统应当将 `send(data: Array<UInt8>, flags: Int32)` 的内部实现使用 `zmq_send` API，结合 `acquireArrayRawData` 获取 Array 底层数据指针，保持外部签名不变。
 
-#### 场景：send 使用 zmq_msg_t API 发送数据
-- **当** 调用 `socket.send("Hello".toArray())` 时
-- **则** 内部通过 `zmq_msg_init_size` 分配消息、拷贝数据、`zmq_msg_send` 发送、`zmq_msg_close` 释放
+#### 场景：发送普通消息
+- **WHEN** 调用 `send(data, flags)` 且 data 非空
+- **THEN** 通过 `acquireArrayRawData` 获取底层数据指针，调用 `zmq_send(socket, pointer, size, flags)`，然后 `releaseArrayRawData`
 
-#### 场景：send 迁移后行为与之前一致
-- **当** 使用迁移后的 `send` 发送数据时
-- **则** 接收端 `recv` 收到的数据与迁移前完全一致
+#### 场景：发送空消息
+- **WHEN** 调用 `send(data, flags)` 且 data.size == 0
+- **THEN** 调用 `zmq_send(socket, CPointer<Unit>(), 0, flags)`
 
-#### 场景：send 失败时抛出 ZmqError
-- **当** `zmq_msg_send` 返回 -1 时
-- **则** 先 `zmq_msg_close` 释放消息，再抛出 `ZmqError`
+#### 场景：发送失败抛出 ZmqError
+- **WHEN** zmq_send 返回 -1
+- **THEN** 抛出 ZmqError，包含 zmq_errno() 返回的错误码
+
+#### 场景：multipart 发送自动受益
+- **WHEN** 调用 `sendMultipart(frames)`
+- **THEN** 内部循环调用优化后的 send，行为不变
 
 ### 需求：send 带 flags 参数重载
 系统应当提供 `send(data: Array<UInt8>, flags: Int32): Unit` 重载方法。
