@@ -1,14 +1,36 @@
 # zmq4cj
 
-ZeroMQ (libzmq) bindings for the Cangjie (仓颉) programming language.
+[![CI](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml/badge.svg)](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml)
+
+ZeroMQ (libzmq v4.3.5) bindings for the Cangjie (仓颉) programming language. Static linking, zero external dependencies at runtime.
+
+[中文文档](README-zh.md)
+
+## Features
+
+- **Safe API**: `Resource` interface for automatic cleanup, exceptions instead of error codes, no `unsafe`/`CPointer` exposed to users
+- **Static linking**: libzmq is compiled from source during build — users don't need to install libzmq separately
+- **Core patterns**: REQ/REP, PUB/SUB, PUSH/PULL, DEALER/ROUTER, PAIR
+- **Multipart messages**: `sendMultipart` / `recvMultipart`
+- **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64)
+- **Thread-safe context**: `ZmqContext.close()` and `socket()` are protected by `Mutex` + `AtomicBool`
 
 ## Prerequisites
 
 - Cangjie toolchain >= 1.1.0
 - CMake >= 3.15
-- C compiler (gcc / clang / MinGW)
+- C compiler (gcc / clang)
 
-## Build
+## Installation
+
+Add to your `cjpm.toml`:
+
+```toml
+[dependencies]
+zmq4cj = { git = "https://github.com/gtn1024/zmq4cj.git" }
+```
+
+Or clone and build from source:
 
 ```bash
 git clone --recursive https://github.com/gtn1024/zmq4cj.git
@@ -18,13 +40,9 @@ cjpm build
 
 On first build, `build.cj` automatically compiles libzmq from source (git submodule) into a static library. Subsequent builds reuse the cached artifact in `vendor/build/`.
 
-To run tests:
+## Quick Start
 
-```bash
-cjpm test
-```
-
-## Quick Start: REQ/REP
+### REQ/REP (Request-Reply)
 
 ```cangjie
 package zmq4cj_demo
@@ -39,11 +57,13 @@ main() {
     rep.bind("tcp://*:5555")
     req.connect("tcp://localhost:5555")
 
-    req.send("Hello".toArray())
-    let msg = rep.recv()
-    rep.send("World".toArray())
-    let reply = req.recv()
+    spawn {
+        let msg = rep.recv()
+        rep.send("World".toArray())
+    }
 
+    req.send("Hello".toArray())
+    let reply = req.recv()
     println("Received: ${String.fromUtf8(reply)}")
 
     req.close()
@@ -52,7 +72,64 @@ main() {
 }
 ```
 
-## API Overview
+### PUB/SUB (Publish-Subscribe)
+
+```cangjie
+let pub = ctx.socket(SocketType.PUB)
+let sub = ctx.socket(SocketType.SUB)
+
+pub.bind("tcp://*:5556")
+sub.connect("tcp://localhost:5556")
+sub.setSubscribe("weather.")
+
+pub.send("weather.temp=25".toArray())
+let msg = sub.recv()
+```
+
+### PUSH/PULL (Pipeline)
+
+```cangjie
+let push = ctx.socket(SocketType.PUSH)
+let pull = ctx.socket(SocketType.PULL)
+
+push.bind("tcp://*:5557")
+pull.connect("tcp://localhost:5557")
+
+push.send("task-1".toArray())
+let task = pull.recv()
+```
+
+### Multipart Messages
+
+```cangjie
+let push = ctx.socket(SocketType.PUSH)
+let pull = ctx.socket(SocketType.PULL)
+
+push.bind("inproc://test")
+pull.connect("inproc://test")
+
+push.sendMultipart([
+    "header".toArray(),
+    "payload".toArray()
+])
+
+let frames = pull.recvMultipart()
+println(frames.size.toString())
+```
+
+### Resource Management with `try-with-resources`
+
+```cangjie
+try (ctx = ZmqContext()) {
+    try (sock = ctx.socket(SocketType.REQ)) {
+        sock.connect("tcp://localhost:5555")
+        sock.send("Hello".toArray())
+        let reply = sock.recv()
+    }
+}
+```
+
+## API Reference
 
 ### ZmqContext
 
@@ -62,7 +139,7 @@ Manages the ZMQ context lifecycle. Implements `Resource` for `try-with-resources
 |--------|-------------|
 | `init()` | Creates a new ZMQ context |
 | `socket(type_: SocketType): ZmqSocket` | Creates a socket of the given type |
-| `close()` | Terminates the context (idempotent) |
+| `close()` | Terminates the context (idempotent, thread-safe) |
 | `isClosed(): Bool` | Checks if the context is closed |
 
 ### ZmqSocket
@@ -71,27 +148,52 @@ Represents a ZMQ socket. Implements `Resource` for `try-with-resources`.
 
 | Method | Description |
 |--------|-------------|
-| `bind(addr: String)` | Binds to an address (e.g. `"tcp://*:5555"`) |
+| `bind(addr: String)` | Binds to an address (e.g. `"tcp://*:5555"`, `"inproc://test"`) |
 | `connect(addr: String)` | Connects to an address |
-| `send(data: Array<UInt8>)` | Sends binary data |
+| `send(data: Array<UInt8>)` | Sends binary data (blocking) |
+| `send(data: Array<UInt8>, flags: Int32)` | Sends with flags (e.g. `SendRecvFlags.SNDMORE`) |
 | `recv(): Array<UInt8>` | Receives binary data (blocking) |
+| `recv(flags: Int32): Array<UInt8>` | Receives with flags (e.g. `SendRecvFlags.DONTWAIT`) |
+| `sendMultipart(frames: Array<Array<UInt8>>)` | Sends a multipart message |
+| `recvMultipart(): Array<Array<UInt8>>` | Receives all frames of a multipart message |
+| `hasReceiveMore(): Bool` | Whether more frames are available |
 | `setSubscribe(topic: String)` | Sets subscription filter for SUB sockets |
-| `close()` | Closes the socket (idempotent) |
+| `close()` | Closes the socket (idempotent, thread-safe) |
 | `isClosed(): Bool` | Checks if the socket is closed |
 
 ### SocketType
 
 | Value | Constant | Description |
 |-------|----------|-------------|
-| 0 | `PAIR` | Bidirectional pair |
-| 1 | `PUB` | Publisher |
-| 2 | `SUB` | Subscriber |
-| 3 | `REQ` | Request |
-| 4 | `REP` | Reply |
-| 5 | `DEALER` | Dealer |
-| 6 | `ROUTER` | Router |
-| 7 | `PULL` | Pull |
-| 8 | `PUSH` | Push |
+| 0 | `PAIR` | Bidirectional pair (exclusive pair of sockets) |
+| 1 | `PUB` | Publisher (distributes messages to subscribers) |
+| 2 | `SUB` | Subscriber (receives messages from publishers) |
+| 3 | `REQ` | Request (sends requests, receives replies) |
+| 4 | `REP` | Reply (receives requests, sends replies) |
+| 5 | `DEALER` | Dealer (advanced request/reply pattern) |
+| 6 | `ROUTER` | Router (advanced request/reply pattern) |
+| 7 | `PULL` | Pull (receives messages from pipeline) |
+| 8 | `PUSH` | Push (sends messages to pipeline) |
+
+### SendRecvFlags
+
+| Value | Constant | Description |
+|-------|----------|-------------|
+| 1 | `DONTWAIT` | Non-blocking send/recv |
+| 2 | `SNDMORE` | More message frames follow |
+
+### SocketOption
+
+| Value | Constant | Description |
+|-------|----------|-------------|
+| 6 | `SUBSCRIBE` | Subscribe to topic (SUB only) |
+| 7 | `UNSUBSCRIBE` | Unsubscribe from topic |
+| 13 | `RCVMORE` | More message frames to receive |
+| 17 | `LINGER` | Linger period for socket shutdown (ms) |
+| 23 | `SNDHWM` | High water mark for outbound messages |
+| 24 | `RCVHWM` | High water mark for inbound messages |
+| 27 | `RCVTIMEO` | Receive timeout (ms) |
+| 28 | `SNDTIMEO` | Send timeout (ms) |
 
 ### ZmqError
 
@@ -104,6 +206,19 @@ Exception class thrown on all ZMQ errors.
 
 ## Thread Safety
 
-- **`ZmqContext.close()` and `socket()`** are thread-safe — multiple threads can safely create sockets or close the context concurrently (protected by `AtomicBool` + `Mutex`).
-- **`ZmqSocket` is NOT thread-safe** — do not call `send`/`recv`/`bind`/`connect`/`close` on the same socket from multiple threads simultaneously. Follow the "one socket per thread" principle.
-- **`ZmqSocket.close()`** is safe to call from any thread (protected by `AtomicBool.compareAndSwap`), but other socket operations must not be concurrent with `close()`.
+- **`ZmqContext.close()` and `socket()`** are thread-safe — multiple threads can safely create sockets or close the context concurrently.
+- **`ZmqSocket.close()`** is thread-safe (idempotent via `AtomicBool.compareAndSwap`).
+- **`ZmqSocket` operations** (`send`/`recv`/`bind`/`connect`) are **NOT thread-safe** — follow the "one socket per thread" principle.
+
+## Running Tests
+
+```bash
+cjpm test
+```
+
+## Running Benchmarks
+
+```bash
+cd benchmark
+cjpm run
+```
