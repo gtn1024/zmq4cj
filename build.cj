@@ -72,7 +72,7 @@ func getCmakeExtraFlags(): String {
 
 @When[os == "macOS"]
 func getCmakeExtraFlags(): String {
-    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC"
+    " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_GNUTLS=OFF"
 }
 
 @When[os == "Windows"]
