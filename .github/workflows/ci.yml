@@ -26,21 +26,3 @@ jobs:
       - name: test
         shell: bash
         run: cjpm test
-
-  build-windows:
-    runs-on: windows-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: Zxilly/setup-cangjie@v2
-        with:
-          channel: sts
-          version: 1.1.0
-      - name: build
-        shell: bash
-        run: cjpm build
-      - name: test
-        shell: bash
-        run: cjpm test

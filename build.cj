@@ -15,26 +15,6 @@ func getPlatformDir(): String {
     "darwin"
 }
 
-@When[os == "Windows"]
-func getPlatformDir(): String {
-    "windows"
-}
-
-@When[os == "Linux"]
-func getLibName(): String {
-    "libzmq.a"
-}
-
-@When[os == "macOS"]
-func getLibName(): String {
-    "libzmq.a"
-}
-
-@When[os == "Windows"]
-func getLibName(): String {
-    "libzmq.a"
-}
-
 func runCmd(cmd: String): Int32 {
     unsafe {
         let cCmd = LibC.mallocCString(cmd)
@@ -51,21 +31,6 @@ func ensureDir(path: String): Unit {
 }
 
 @When[os == "Linux"]
-func getCmakeGenerator(): String {
-    ""
-}
-
-@When[os == "macOS"]
-func getCmakeGenerator(): String {
-    ""
-}
-
-@When[os == "Windows"]
-func getCmakeGenerator(): String {
-    " -G \"MinGW Makefiles\""
-}
-
-@When[os == "Linux"]
 func getCmakeExtraFlags(): String {
     " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_TLS=OFF"
 }
@@ -74,29 +39,11 @@ func getCmakeExtraFlags(): String {
 func getCmakeExtraFlags(): String {
     " -DCMAKE_C_FLAGS=-fPIC -DCMAKE_CXX_FLAGS=-fPIC -DWITH_TLS=OFF"
 }
-
-@When[os == "Windows"]
-func getCmakeExtraFlags(): String {
-    " \"-DCMAKE_CXX_FLAGS=-static-libstdc++ -static-libgcc\" \"-DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ -static-libgcc\""
-}
-
-@When[os == "Windows"]
-func copyGccLibs(libDir: String): Unit {
-    runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libstdc++.a ${libDir}/\"")
-    runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libgcc.a ${libDir}/\"")
-    runCmd("bash -c \"cp C:/mingw64/x86_64-w64-mingw32/lib/libwinpthread.a ${libDir}/ 2>/dev/null || true\"")
-    runCmd("bash -c \"cp C:/mingw64/x86_64-w64-mingw32/lib/libmingwex.a ${libDir}/ 2>/dev/null || true\"")
-    println("Copied GCC runtime libs to ${libDir}")
-}
-
-@When[os != "Windows"]
-func copyGccLibs(libDir: String): Unit {}
 
 func stagePreBuild(): Int64 {
     let platform = getPlatformDir()
-    let libName = getLibName()
     let buildDir = "vendor/build/${platform}"
-    let libPath = "${buildDir}/lib/${libName}"
+    let libPath = "${buildDir}/lib/libzmq.a"
 
     if (exists(libPath)) {
         return 0
@@ -111,7 +58,7 @@ func stagePreBuild(): Int64 {
 
     println("Building libzmq for ${platform}...")
 
-    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF${getCmakeGenerator()}${getCmakeExtraFlags()}"
+    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF${getCmakeExtraFlags()}"
     let cmakeRc = runCmd(cmakeCmd)
     if (cmakeRc != 0) {
         println("ERROR: cmake failed with return code ${cmakeRc}")
@@ -123,8 +70,6 @@ func stagePreBuild(): Int64 {
         println("ERROR: build failed with return code ${makeRc}")
         return 1
     }
-
-    copyGccLibs("${buildDir}/lib")
 
     println("libzmq built successfully: ${libPath}")
     0

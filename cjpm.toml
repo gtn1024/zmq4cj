@@ -38,8 +38,3 @@ zmq = { path = "vendor/build/darwin/lib" }
 [target.aarch64-apple-darwin.ffi.c]
 zmq = { path = "vendor/build/darwin/lib" }
 
-[target.x86_64-w64-mingw32]
-  link-option = "-lstdc++ -lgcc -lunwind -lwinpthread -lmingwex -lws2_32 -liphlpapi"
-
-[target.x86_64-w64-mingw32.ffi.c]
-zmq = { path = "vendor/build/windows/lib" }
