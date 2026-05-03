@@ -148,6 +148,26 @@ let sub = ctx.socket(SocketType.SUB)
 sub.setStringOption(SocketOption.UNSUBSCRIBE, "weather.")
 ```
 
+### 轮询（zmq_poll）
+
+```cangjie
+import std.collection.ArrayList
+
+let push = ctx.socket(SocketType.PUSH)
+let pull = ctx.socket(SocketType.PULL)
+push.bind("tcp://*:5555")
+pull.connect("tcp://localhost:5555")
+
+push.send("event".toArray())
+
+let list = ArrayList<PollItem>()
+list.add(PollItem(pull, PollEvent.POLLIN.value))
+let ready = ZmqPoll.poll(list.toArray(), 1000)  // 1 秒超时
+if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
+    let msg = pull.recv()
+}
+```
+
 ## API 参考
 
 ### ZmqContext
@@ -225,6 +245,32 @@ sub.setStringOption(SocketOption.UNSUBSCRIBE, "weather.")
 |------|------|
 | `errno: Int32` | ZMQ 错误码 |
 | `message: String` | 来自 `zmq_strerror` 的错误描述 |
+
+### PollItem
+
+表示轮询操作中要监听的 socket。
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `socket` | `ZmqSocket` | 要监听的 Socket |
+| `events` | `Int16` | 事件掩码（`PollEvent` 值的组合） |
+| `revents` | `Int16` | 返回的事件（由 `ZmqPoll.poll()` 填充） |
+
+### ZmqPoll
+
+提供轮询操作的静态类。
+
+| 方法 | 说明 |
+|------|------|
+| `poll(items: Array<PollItem>, timeout: Int64): Int32` | 轮询多个 Socket。返回就绪的 item 数量。`timeout` 单位为毫秒（-1 = 无限等待，0 = 立即返回）。 |
+
+### PollEvent
+
+| 值 | 常量 | 说明 |
+|----|------|------|
+| 1 | `POLLIN` | Socket 可读 |
+| 2 | `POLLOUT` | Socket 可写 |
+| 4 | `POLLERR` | Socket 出错 |
 
 ## 线程安全
 

@@ -148,6 +148,26 @@ let sub = ctx.socket(SocketType.SUB)
 sub.setStringOption(SocketOption.UNSUBSCRIBE, "weather.")
 ```
 
+### Polling (zmq_poll)
+
+```cangjie
+import std.collection.ArrayList
+
+let push = ctx.socket(SocketType.PUSH)
+let pull = ctx.socket(SocketType.PULL)
+push.bind("tcp://*:5555")
+pull.connect("tcp://localhost:5555")
+
+push.send("event".toArray())
+
+let list = ArrayList<PollItem>()
+list.add(PollItem(pull, PollEvent.POLLIN.value))
+let ready = ZmqPoll.poll(list.toArray(), 1000)  // 1s timeout
+if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
+    let msg = pull.recv()
+}
+```
+
 ## API Reference
 
 ### ZmqContext
@@ -225,6 +245,32 @@ Exception class thrown on all ZMQ errors.
 |----------|-------------|
 | `errno: Int32` | ZMQ error code |
 | `message: String` | Error description from `zmq_strerror` |
+
+### PollItem
+
+Represents a socket to monitor in a poll operation.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `socket` | `ZmqSocket` | The socket to monitor |
+| `events` | `Int16` | Event mask (combination of `PollEvent` values) |
+| `revents` | `Int16` | Returned events (filled by `ZmqPoll.poll()`) |
+
+### ZmqPoll
+
+Static class providing the poll operation.
+
+| Method | Description |
+|--------|-------------|
+| `poll(items: Array<PollItem>, timeout: Int64): Int32` | Polls multiple sockets. Returns number of ready items. `timeout` in ms (-1 = infinite, 0 = immediate). |
+
+### PollEvent
+
+| Value | Constant | Description |
+|-------|----------|-------------|
+| 1 | `POLLIN` | Socket is readable |
+| 2 | `POLLOUT` | Socket is writable |
+| 4 | `POLLERR` | Socket has error |
 
 ## Thread Safety
 
