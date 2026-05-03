@@ -77,7 +77,7 @@ func getCmakeExtraFlags(): String {
 
 @When[os == "Windows"]
 func getCmakeExtraFlags(): String {
-    ""
+    " -DCMAKE_CXX_FLAGS=-stdlib=libc++"
 }
 
 func stagePreBuild(): Int64 {
