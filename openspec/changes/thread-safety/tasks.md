@@ -7,11 +7,11 @@
 
 ## 2. ZmqContext close() 和 socket() 线程安全
 
-- [ ] 2.1 在 `ZmqContext` 中添加 `import std.sync.{AtomicBool, Mutex}`
-- [ ] 2.2 新增 `let closed = AtomicBool(false)` 和 `let mutex = Mutex()` 字段
-- [ ] 2.3 重写 `close()`：先用 `compareAndSwap` 防重入，再用 `synchronized(mutex)` 保护 `zmq_ctx_term` 和 handle 置空
-- [ ] 2.4 更新 `isClosed()`：返回 `closed.load()`
-- [ ] 2.5 重写 `socket()`：用 `synchronized(mutex)` 保护整个方法体（检查 closed + 创建 socket）
+- [x] 2.1 在 `ZmqContext` 中添加 `import std.sync.{AtomicBool, Mutex}`
+- [x] 2.2 新增 `let closed = AtomicBool(false)` 和 `let mutex = Mutex()` 字段
+- [x] 2.3 重写 `close()`：先用 `compareAndSwap` 防重入，再用 `synchronized(mutex)` 保护 `zmq_ctx_term` 和 handle 置空
+- [x] 2.4 更新 `isClosed()`：返回 `closed.load()`
+- [x] 2.5 重写 `socket()`：用 `synchronized(mutex)` 保护整个方法体（检查 closed + 创建 socket）
 
 ## 3. 验证
 
