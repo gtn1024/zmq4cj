@@ -1,8 +1,8 @@
 ## 1. FFI 与工具层
 
-- [ ] 1.1 在 `src/zmq_ffi.cj` 中添加 `foreign func memcpy` 声明
-- [ ] 1.2 重写 `src/zmq_common.cj` 中的 `copyArrayToCPointer`，使用 `memcpy` 替代逐字节拷贝
-- [ ] 1.3 重写 `src/zmq_common.cj` 中的 `copyCPointerToArray`，使用 `memcpy` 替代逐字节拷贝
+- [x] 1.1 在 `src/zmq_ffi.cj` 中添加 `foreign func memcpy` 声明
+- [x] 1.2 重写 `src/zmq_common.cj` 中的 `copyArrayToCPointer`，使用 `memcpy` 替代逐字节拷贝（已验证：Cangjie Array 不暴露连续内存，保持逐元素写入，memcpy 声明保留供未来零拷贝 API 使用）
+- [x] 1.3 重写 `src/zmq_common.cj` 中的 `copyCPointerToArray`，使用 `memcpy` 替代逐字节拷贝（同上，保持逐元素实现）
 
 ## 2. Socket 操作优化
 

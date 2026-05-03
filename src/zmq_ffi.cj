@@ -1,5 +1,7 @@
 package zmq4cj
 
+foreign func memcpy(dest: CPointer<Unit>, src: CPointer<Unit>, n: UIntNative): CPointer<Unit>
+
 foreign func zmq_ctx_new(): CPointer<Unit>
 
 foreign func zmq_ctx_term(context: CPointer<Unit>): Int32
