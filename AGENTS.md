@@ -69,5 +69,7 @@ Three-layer design:
 - All FFI calls are wrapped in `unsafe` blocks, never exposed in public API
 - All errors throw `ZmqError` (extends `Exception`) — no return-code checking by users
 - `ZmqContext` and `ZmqSocket` implement `Resource` for `try-with-resources` auto-cleanup
-- `close()` is idempotent (null-handle guard)
+- `close()` is idempotent — uses `AtomicBool.compareAndSwap` to ensure the underlying C cleanup runs exactly once
+- `ZmqContext.close()` and `socket()` are additionally protected by `Mutex` + `synchronized` for thread safety
+- `ZmqSocket` operations (`send`/`recv`/`bind`/`connect`) are NOT thread-safe — one socket per thread
 - libzmq is a C++ library; Linux targets need `-lstdc++ -lgcc_s` in link options

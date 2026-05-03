@@ -3,6 +3,7 @@ package zmq4cj
 import std.unittest.*
 import std.unittest.testmacro.*
 import std.time.*
+import std.sync.SyncCounter
 
 @Test
 public class ZmqPatternTest {
@@ -259,5 +260,68 @@ public class ZmqPatternTest {
         push.close()
         pull.close()
         ctx.close()
+    }
+
+    @TestCase
+    func testSocketConcurrentClose(): Unit {
+        let ctx = ZmqContext()
+        let sock = ctx.socket(SocketType.PAIR)
+        let counter = SyncCounter(10)
+        for (_ in 0..10) {
+            spawn {
+                sock.close()
+                counter.dec()
+            }
+        }
+        counter.waitUntilZero()
+        @Assert(sock.isClosed(), true)
+        ctx.close()
+    }
+
+    @TestCase
+    func testContextConcurrentClose(): Unit {
+        let ctx = ZmqContext()
+        let counter = SyncCounter(10)
+        for (_ in 0..10) {
+            spawn {
+                ctx.close()
+                counter.dec()
+            }
+        }
+        counter.waitUntilZero()
+        @Assert(ctx.isClosed(), true)
+    }
+
+    @TestCase
+    func testContextSocketAfterClose(): Unit {
+        let ctx = ZmqContext()
+        ctx.close()
+        var thrown = false
+        try {
+            ctx.socket(SocketType.REQ)
+        } catch (_: ZmqError) {
+            thrown = true
+        }
+        @Assert(thrown, true)
+    }
+
+    @TestCase
+    func testSocketCloseIdempotent(): Unit {
+        let ctx = ZmqContext()
+        let sock = ctx.socket(SocketType.PAIR)
+        sock.close()
+        sock.close()
+        sock.close()
+        @Assert(sock.isClosed(), true)
+        ctx.close()
+    }
+
+    @TestCase
+    func testContextCloseIdempotent(): Unit {
+        let ctx = ZmqContext()
+        ctx.close()
+        ctx.close()
+        ctx.close()
+        @Assert(ctx.isClosed(), true)
     }
 }

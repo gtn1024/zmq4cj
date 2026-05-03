@@ -101,3 +101,9 @@ Exception class thrown on all ZMQ errors.
 |----------|-------------|
 | `errno: Int32` | ZMQ error code |
 | `message: String` | Error description from `zmq_strerror` |
+
+## Thread Safety
+
+- **`ZmqContext.close()` and `socket()`** are thread-safe — multiple threads can safely create sockets or close the context concurrently (protected by `AtomicBool` + `Mutex`).
+- **`ZmqSocket` is NOT thread-safe** — do not call `send`/`recv`/`bind`/`connect`/`close` on the same socket from multiple threads simultaneously. Follow the "one socket per thread" principle.
+- **`ZmqSocket.close()`** is safe to call from any thread (protected by `AtomicBool.compareAndSwap`), but other socket operations must not be concurrent with `close()`.

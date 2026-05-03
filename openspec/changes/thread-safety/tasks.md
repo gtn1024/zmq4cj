@@ -15,10 +15,10 @@
 
 ## 3. 验证
 
-- [ ] 3.1 确认 `cjpm build` 编译通过
-- [ ] 3.2 确认 `cjpm test` 所有现有测试通过（REQ/REP、PUB/SUB、PUSH/PULL、DEALER/ROUTER、PAIR、multipart）
+- [x] 3.1 确认 `cjpm build` 编译通过
+- [x] 3.2 确认 `cjpm test` 所有现有测试通过（REQ/REP、PUB/SUB、PUSH/PULL、DEALER/ROUTER、PAIR、multipart）
 
 ## 4. 文档
 
-- [ ] 4.1 在 README 中添加"线程安全"章节，说明 ZmqContext 的 close()/socket() 线程安全，ZmqSocket 不线程安全
-- [ ] 4.2 更新 AGENTS.md 中的架构说明，标注线程安全设计
+- [x] 4.1 在 README 中添加"线程安全"章节，说明 ZmqContext 的 close()/socket() 线程安全，ZmqSocket 不线程安全
+- [x] 4.2 更新 AGENTS.md 中的架构说明，标注线程安全设计
