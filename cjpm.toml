@@ -33,7 +33,7 @@ zmq = { path = "vendor/build/darwin/lib" }
 zmq = { path = "vendor/build/darwin/lib" }
 
 [target.x86_64-w64-mingw32]
-  link-option = "-lc++ -lunwind -lws2_32 -liphlpapi"
+  link-option = "-LC:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -lstdc++ -lgcc -lws2_32 -liphlpapi"
 
 [target.x86_64-w64-mingw32.ffi.c]
 zmq = { path = "vendor/build/windows/lib" }
