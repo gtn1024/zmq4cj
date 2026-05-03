@@ -23,10 +23,6 @@ jobs:
       - name: build
         shell: bash
         run: cjpm build
-      - name: debug info
-        shell: bash
-        run: |
-          find /c/mingw64 -name 'libstdc++.a' 2>/dev/null || find C:/mingw64 -name 'libstdc++.a' 2>/dev/null || echo "not found"
       - name: test
         shell: bash
         run: cjpm test

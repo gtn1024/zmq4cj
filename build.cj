@@ -80,6 +80,16 @@ func getCmakeExtraFlags(): String {
     " \"-DCMAKE_CXX_FLAGS=-static-libstdc++ -static-libgcc\" \"-DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ -static-libgcc\""
 }
 
+@When[os == "Windows"]
+func copyGccLibs(libDir: String): Unit {
+    runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libstdc++.a ${libDir}/\"")
+    runCmd("bash -c \"shopt -s nullglob && cp C:/mingw64/lib/gcc/x86_64-w64-mingw32/*/libgcc.a ${libDir}/\"")
+    println("Copied GCC runtime libs to ${libDir}")
+}
+
+@When[os != "Windows"]
+func copyGccLibs(libDir: String): Unit {}
+
 func stagePreBuild(): Int64 {
     let platform = getPlatformDir()
     let libName = getLibName()
@@ -111,6 +121,8 @@ func stagePreBuild(): Int64 {
         println("ERROR: build failed with return code ${makeRc}")
         return 1
     }
+
+    copyGccLibs("${buildDir}/lib")
 
     println("libzmq built successfully: ${libPath}")
     0
