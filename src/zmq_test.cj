@@ -324,4 +324,86 @@ public class ZmqPatternTest {
         ctx.close()
         @Assert(ctx.isClosed(), true)
     }
+
+    @TestCase
+    func testLargeMessage(): Unit {
+        let ctx = ZmqContext()
+        let push = ctx.socket(SocketType.PUSH)
+        let pull = ctx.socket(SocketType.PULL)
+
+        push.bind("inproc://large-msg-test")
+        pull.connect("inproc://large-msg-test")
+
+        let size = 1024 * 1024
+        let sent = Array<UInt8>(size, repeat: 0)
+        for (i in 0..size) {
+            sent[i] = UInt8(i % 256)
+        }
+
+        push.send(sent)
+        let received = pull.recv()
+
+        @Assert(received.size, Int64(size))
+        @Assert(received == sent, true)
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testBinaryDataWithZeros(): Unit {
+        let ctx = ZmqContext()
+        let push = ctx.socket(SocketType.PUSH)
+        let pull = ctx.socket(SocketType.PULL)
+
+        push.bind("inproc://binary-test")
+        pull.connect("inproc://binary-test")
+
+        let sent = Array<UInt8>(256, repeat: 0)
+        for (i in 0..256) {
+            sent[i] = UInt8(i)
+        }
+
+        push.send(sent)
+        let received = pull.recv()
+
+        @Assert(received.size, 256)
+        @Assert(received == sent, true)
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testRapidSendRecv(): Unit {
+        let ctx = ZmqContext()
+        let push = ctx.socket(SocketType.PUSH)
+        let pull = ctx.socket(SocketType.PULL)
+
+        push.bind("inproc://rapid-test")
+        pull.connect("inproc://rapid-test")
+
+        let count = 1000
+        let fut = spawn {
+            var received = 0
+            while (received < count) {
+                pull.recv()
+                received++
+            }
+            received
+        }
+
+        for (i in 0..count) {
+            push.send("msg".toArray())
+        }
+
+        let total = fut.get()
+        @Assert(total, Int64(count))
+
+        push.close()
+        pull.close()
+        ctx.close()
+    }
 }
