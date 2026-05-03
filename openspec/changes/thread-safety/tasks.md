@@ -1,9 +1,9 @@
 ## 1. ZmqSocket close() 原子保护
 
-- [ ] 1.1 在 `ZmqSocket` 中添加 `import std.sync.AtomicBool`
-- [ ] 1.2 新增 `let closed = AtomicBool(false)` 字段
-- [ ] 1.3 重写 `close()`：使用 `closed.compareAndSwap(false, true)` 确保只执行一次
-- [ ] 1.4 更新 `isClosed()`：返回 `closed.load()`
+- [x] 1.1 在 `ZmqSocket` 中添加 `import std.sync.AtomicBool`
+- [x] 1.2 新增 `let closed = AtomicBool(false)` 字段
+- [x] 1.3 重写 `close()`：使用 `closed.compareAndSwap(false, true)` 确保只执行一次
+- [x] 1.4 更新 `isClosed()`：返回 `closed.load()`
 
 ## 2. ZmqContext close() 和 socket() 线程安全
 

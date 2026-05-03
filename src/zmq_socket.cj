@@ -1,20 +1,22 @@
 package zmq4cj
 
 import std.collection.ArrayList
+import std.sync.AtomicBool
 
 public class ZmqSocket <: Resource {
     var handle: CPointer<Unit>
+    let closed = AtomicBool(false)
 
     init(handle: CPointer<Unit>) {
         this.handle = handle
     }
 
     public func isClosed(): Bool {
-        handle.isNull()
+        closed.load()
     }
 
     public func close(): Unit {
-        if (isClosed()) {
+        if (!closed.compareAndSwap(false, true)) {
             return
         }
         unsafe {
