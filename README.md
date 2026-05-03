@@ -129,6 +129,25 @@ try (ctx = ZmqContext()) {
 }
 ```
 
+### Socket Options
+
+```cangjie
+let sock = ctx.socket(SocketType.REQ)
+
+// Set receive timeout to 5 seconds
+sock.setIntOption(SocketOption.RCVTIMEO, 5000)
+
+// Set linger to 0 (don't wait on close)
+sock.setIntOption(SocketOption.LINGER, 0)
+
+// Read current value
+let linger = sock.getIntOption(SocketOption.LINGER)
+
+// Unsubscribe from a topic
+let sub = ctx.socket(SocketType.SUB)
+sub.setStringOption(SocketOption.UNSUBSCRIBE, "weather.")
+```
+
 ## API Reference
 
 ### ZmqContext
@@ -158,6 +177,9 @@ Represents a ZMQ socket. Implements `Resource` for `try-with-resources`.
 | `recvMultipart(): Array<Array<UInt8>>` | Receives all frames of a multipart message |
 | `hasReceiveMore(): Bool` | Whether more frames are available |
 | `setSubscribe(topic: String)` | Sets subscription filter for SUB sockets |
+| `setIntOption(option, value: Int32)` | Sets an integer socket option (LINGER, RCVTIMEO, SNDHWM, etc.) |
+| `getIntOption(option): Int32` | Gets an integer socket option |
+| `setStringOption(option, value: String)` | Sets a string socket option (SUBSCRIBE, UNSUBSCRIBE) |
 | `close()` | Closes the socket (idempotent, thread-safe) |
 | `isClosed(): Bool` | Checks if the socket is closed |
 

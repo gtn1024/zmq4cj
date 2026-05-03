@@ -129,6 +129,25 @@ try (ctx = ZmqContext()) {
 }
 ```
 
+### Socket 选项
+
+```cangjie
+let sock = ctx.socket(SocketType.REQ)
+
+// 设置接收超时为 5 秒
+sock.setIntOption(SocketOption.RCVTIMEO, 5000)
+
+// 设置 LINGER 为 0（关闭时不等待）
+sock.setIntOption(SocketOption.LINGER, 0)
+
+// 读取当前值
+let linger = sock.getIntOption(SocketOption.LINGER)
+
+// 取消订阅
+let sub = ctx.socket(SocketType.SUB)
+sub.setStringOption(SocketOption.UNSUBSCRIBE, "weather.")
+```
+
 ## API 参考
 
 ### ZmqContext
@@ -158,6 +177,9 @@ try (ctx = ZmqContext()) {
 | `recvMultipart(): Array<Array<UInt8>>` | 接收多部分消息的所有帧 |
 | `hasReceiveMore(): Bool` | 是否还有更多帧可接收 |
 | `setSubscribe(topic: String)` | 设置 SUB Socket 的订阅主题 |
+| `setIntOption(option, value: Int32)` | 设置整数类型的 Socket 选项（LINGER、RCVTIMEO、SNDHWM 等） |
+| `getIntOption(option): Int32` | 读取整数类型的 Socket 选项 |
+| `setStringOption(option, value: String)` | 设置字符串类型的 Socket 选项（SUBSCRIBE、UNSUBSCRIBE） |
 | `close()` | 关闭 Socket（幂等、线程安全） |
 | `isClosed(): Bool` | 检查 Socket 是否已关闭 |
 
