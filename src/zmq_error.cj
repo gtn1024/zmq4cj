@@ -1,4 +1,4 @@
-package zmq4cj
+package zmq
 
 public open class ZmqError <: Exception {
     public let errno: Int32

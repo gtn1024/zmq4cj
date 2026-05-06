@@ -1,4 +1,4 @@
-# zmq4cj
+# zmq
 
 [![CI](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml/badge.svg)](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml)
 
@@ -27,7 +27,7 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 
 ```toml
 [dependencies]
-zmq4cj = { git = "https://github.com/gtn1024/zmq4cj.git" }
+zmq = { git = "https://github.com/gtn1024/zmq4cj.git" }
 ```
 
 或从源码构建：
@@ -45,9 +45,9 @@ cjpm build
 ### REQ/REP（请求-应答）
 
 ```cangjie
-package zmq4cj_demo
+package zmq_demo
 
-import zmq4cj.*
+import zmq.*
 
 main() {
     let ctx = ZmqContext()

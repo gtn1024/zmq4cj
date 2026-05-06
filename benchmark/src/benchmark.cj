@@ -1,6 +1,6 @@
-package zmq4cj_bench
+package zmq_bench
 
-import zmq4cj.*
+import zmq.*
 import std.time.*
 
 let WARMUP_MSG_COUNT: Int64 = 1000
@@ -171,7 +171,7 @@ func benchMultipart(frameCount: Int64, frameSize: Int64, count: Int64, transport
 }
 
 main(): Int64 {
-    println("=== zmq4cj benchmark ===")
+    println("=== zmq benchmark ===")
     println()
 
     println("--- Throughput (inproc) ---")

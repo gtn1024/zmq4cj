@@ -1,4 +1,4 @@
-package zmq4cj_build_script
+package zmq_build_script
 
 import std.process.*
 import std.fs.{exists, Directory}
@@ -69,6 +69,15 @@ func stagePreBuild(): Int64 {
     if (makeRc != 0) {
         println("ERROR: build failed with return code ${makeRc}")
         return 1
+    }
+
+    let vendorLibPath = "${buildDir}/lib/libzmq_vendor.a"
+    if (!exists(vendorLibPath)) {
+        let cpRc = runCmd("cp ${libPath} ${vendorLibPath}")
+        if (cpRc != 0) {
+            println("ERROR: failed to copy ${libPath} to ${vendorLibPath}")
+            return 1
+        }
     }
 
     println("libzmq built successfully: ${libPath}")

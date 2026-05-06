@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-zmq4cj is a ZeroMQ (libzmq) binding library for the Cangjie (仓颉) programming language. It wraps the C library via FFI (`foreign func`) and provides a safe, idiomatic Cangjie API.
+zmq is a ZeroMQ (libzmq) binding library for the Cangjie (仓颉) programming language. It wraps the C library via FFI (`foreign func`) and provides a safe, idiomatic Cangjie API.
 
 ## Tech Stack
 

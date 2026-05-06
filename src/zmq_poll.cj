@@ -1,4 +1,4 @@
-package zmq4cj
+package zmq
 
 public class PollItem {
     let socket: ZmqSocket

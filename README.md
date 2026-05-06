@@ -1,4 +1,4 @@
-# zmq4cj
+# zmq
 
 [![CI](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml/badge.svg)](https://github.com/gtn1024/zmq4cj/actions/workflows/ci.yml)
 
@@ -27,7 +27,7 @@ Add to your `cjpm.toml`:
 
 ```toml
 [dependencies]
-zmq4cj = { git = "https://github.com/gtn1024/zmq4cj.git" }
+zmq = { git = "https://github.com/gtn1024/zmq4cj.git" }
 ```
 
 Or clone and build from source:
@@ -45,9 +45,9 @@ On first build, `build.cj` automatically compiles libzmq from source (git submod
 ### REQ/REP (Request-Reply)
 
 ```cangjie
-package zmq4cj_demo
+package zmq_demo
 
-import zmq4cj.*
+import zmq.*
 
 main() {
     let ctx = ZmqContext()

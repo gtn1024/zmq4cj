@@ -1,4 +1,4 @@
-package zmq4cj
+package zmq
 
 foreign func memcpy(dest: CPointer<Unit>, src: CPointer<Unit>, n: UIntNative): CPointer<Unit>
 

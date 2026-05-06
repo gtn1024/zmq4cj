@@ -1,4 +1,4 @@
-package zmq4cj
+package zmq
 
 public enum SocketType {
     | PAIR

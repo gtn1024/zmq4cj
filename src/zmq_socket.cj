@@ -1,4 +1,4 @@
-package zmq4cj
+package zmq
 
 import std.collection.ArrayList
 import std.sync.AtomicBool
