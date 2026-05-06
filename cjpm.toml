@@ -3,7 +3,7 @@
   name = "zmq"
   organization = ""
   description = "ZeroMQ bindings for Cangjie"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "static"

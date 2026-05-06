@@ -23,14 +23,16 @@ ZeroMQ (libzmq v4.3.5) bindings for the Cangjie (仓颉) programming language. S
 
 ## Installation
 
+### From central repository
+
 Add to your `cjpm.toml`:
 
 ```toml
 [dependencies]
-zmq = { git = "https://github.com/gtn1024/zmq4cj.git" }
+  zmq = "0.0.1"
 ```
 
-Or clone and build from source:
+### From source
 
 ```bash
 git clone --recursive https://github.com/gtn1024/zmq4cj.git
@@ -38,7 +40,7 @@ cd zmq4cj
 cjpm build
 ```
 
-On first build, `build.cj` automatically compiles libzmq from source (git submodule) into a static library. Subsequent builds reuse the cached artifact in `vendor/build/`.
+On first build, `build.cj` automatically compiles libzmq from source into a static library. Subsequent builds reuse the cached artifact.
 
 ## Quick Start
 

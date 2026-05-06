@@ -23,14 +23,16 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 
 ## 安装
 
+### 从中心仓库
+
 在 `cjpm.toml` 中添加依赖：
 
 ```toml
 [dependencies]
-zmq = { git = "https://github.com/gtn1024/zmq4cj.git" }
+  zmq = "0.0.1"
 ```
 
-或从源码构建：
+### 从源码构建
 
 ```bash
 git clone --recursive https://github.com/gtn1024/zmq4cj.git
@@ -38,7 +40,7 @@ cd zmq4cj
 cjpm build
 ```
 
-首次构建时，`build.cj` 会自动从源码编译 libzmq（git 子模块）为静态库。后续构建复用 `vendor/build/` 中的缓存产物。
+首次构建时，`build.cj` 会自动从源码编译 libzmq 为静态库。后续构建复用缓存产物。
 
 ## 快速入门
 
