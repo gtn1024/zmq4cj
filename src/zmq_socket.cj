@@ -41,6 +41,22 @@ public class ZmqSocket <: Resource {
         freeCString(cs)
     }
 
+    public func unbind(addr: String): Unit {
+        let cs = stringToCString(addr)
+        unsafe {
+            checkResult(zmq_unbind(handle, cs))
+        }
+        freeCString(cs)
+    }
+
+    public func disconnect(addr: String): Unit {
+        let cs = stringToCString(addr)
+        unsafe {
+            checkResult(zmq_disconnect(handle, cs))
+        }
+        freeCString(cs)
+    }
+
     public func send(data: Array<UInt8>, flags: Int32): Unit {
         if (data.size == 0) {
             unsafe { checkResult(zmq_send(handle, CPointer<Unit>(), UIntNative(0), flags)) }

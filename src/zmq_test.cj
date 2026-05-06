@@ -589,4 +589,59 @@ public class ZmqPatternTest {
         stream.close()
         ctx.close()
     }
+
+    @TestCase
+    func testUnbind(): Unit {
+        let ctx = ZmqContext()
+        let rep = ctx.socket(SocketType.REP)
+        let addr = "inproc://test-unbind"
+        rep.bind(addr)
+        rep.unbind(addr)
+        rep.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testUnbindNonexistent(): Unit {
+        let ctx = ZmqContext()
+        let rep = ctx.socket(SocketType.REP)
+        var caught = false
+        try {
+            rep.unbind("tcp://*:5593")
+        } catch (_: ZmqError) {
+            caught = true
+        }
+        @Assert(caught, true)
+        rep.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testDisconnect(): Unit {
+        let ctx = ZmqContext()
+        let rep = ctx.socket(SocketType.REP)
+        let req = ctx.socket(SocketType.REQ)
+        let addr = "inproc://test-disconnect"
+        rep.bind(addr)
+        req.connect(addr)
+        req.disconnect(addr)
+        req.close()
+        rep.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testDisconnectNonexistent(): Unit {
+        let ctx = ZmqContext()
+        let req = ctx.socket(SocketType.REQ)
+        var caught = false
+        try {
+            req.disconnect("inproc://nonexistent")
+        } catch (_: ZmqError) {
+            caught = true
+        }
+        @Assert(caught, true)
+        req.close()
+        ctx.close()
+    }
 }
