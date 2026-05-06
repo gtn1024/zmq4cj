@@ -11,6 +11,7 @@
   override-compile-option = ""
   link-option = ""
   package-configuration = {}
+  license = ["MIT"]
 
 [dependencies]
 
