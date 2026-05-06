@@ -142,6 +142,73 @@ public class ZmqSocket <: Resource {
         val
     }
 
+    public func setInt64Option(option: SocketOption, value: Int64): Unit {
+        var val = value
+        var size = UIntNative(8)
+        unsafe {
+            checkResult(zmq_setsockopt(handle, option.value, CPointer<Unit>(CPointer<Int64>(inout val)), size))
+        }
+    }
+
+    public func getInt64Option(option: SocketOption): Int64 {
+        var val: Int64 = 0
+        var size = UIntNative(8)
+        unsafe {
+            checkResult(zmq_getsockopt(handle, option.value, CPointer<Unit>(CPointer<Int64>(inout val)), CPointer<UIntNative>(inout size)))
+        }
+        val
+    }
+
+    public func setUInt64Option(option: SocketOption, value: UInt64): Unit {
+        var val = value
+        var size = UIntNative(8)
+        unsafe {
+            checkResult(zmq_setsockopt(handle, option.value, CPointer<Unit>(CPointer<UInt64>(inout val)), size))
+        }
+    }
+
+    public func getUInt64Option(option: SocketOption): UInt64 {
+        var val: UInt64 = 0
+        var size = UIntNative(8)
+        unsafe {
+            checkResult(zmq_getsockopt(handle, option.value, CPointer<Unit>(CPointer<UInt64>(inout val)), CPointer<UIntNative>(inout size)))
+        }
+        val
+    }
+
+    public func setBinaryOption(option: SocketOption, value: Array<UInt8>): Unit {
+        unsafe {
+            let handle2 = acquireArrayRawData<UInt8>(value)
+            let rc = zmq_setsockopt(handle, option.value, CPointer<Unit>(handle2.pointer), UIntNative(value.size))
+            releaseArrayRawData<UInt8>(handle2)
+            checkResult(rc)
+        }
+    }
+
+    public func getBinaryOption(option: SocketOption): Array<UInt8> {
+        let maxLen = 256
+        var size = UIntNative(maxLen)
+        let buf = Array<UInt8>(maxLen, repeat: 0)
+        unsafe {
+            let handle2 = acquireArrayRawData<UInt8>(buf)
+            let rc = zmq_getsockopt(handle, option.value, CPointer<Unit>(handle2.pointer), CPointer<UIntNative>(inout size))
+            releaseArrayRawData<UInt8>(handle2)
+            checkResult(rc)
+        }
+        let actualLen = Int64(size)
+        if (actualLen == maxLen) {
+            buf
+        } else {
+            let result = Array<UInt8>(actualLen, repeat: 0)
+            var i: Int64 = 0
+            while (i < actualLen) {
+                result[i] = buf[i]
+                i++
+            }
+            result
+        }
+    }
+
     public func setStringOption(option: SocketOption, value: String): Unit {
         let cs = stringToCString(value)
         unsafe {
@@ -152,5 +219,9 @@ public class ZmqSocket <: Resource {
 
     public func setSubscribe(topic: String): Unit {
         setStringOption(SocketOption.SUBSCRIBE, topic)
+    }
+
+    public func setUnsubscribe(topic: String): Unit {
+        setStringOption(SocketOption.UNSUBSCRIBE, topic)
     }
 }

@@ -644,4 +644,76 @@ public class ZmqPatternTest {
         req.close()
         ctx.close()
     }
+
+    @TestCase
+    func testInt32Options(): Unit {
+        let ctx = ZmqContext()
+        let socket = ctx.socket(SocketType.REQ)
+
+        socket.setIntOption(SocketOption.RECONNECT_IVL, 5000)
+        @Assert(socket.getIntOption(SocketOption.RECONNECT_IVL), 5000)
+
+        socket.setIntOption(SocketOption.BACKLOG, 100)
+        @Assert(socket.getIntOption(SocketOption.BACKLOG), 100)
+
+        socket.setIntOption(SocketOption.LINGER, 1000)
+        @Assert(socket.getIntOption(SocketOption.LINGER), 1000)
+
+        socket.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testInt64Option(): Unit {
+        let ctx = ZmqContext()
+        let socket = ctx.socket(SocketType.REQ)
+
+        socket.setInt64Option(SocketOption.MAXMSGSIZE, 1048576)
+        @Assert(socket.getInt64Option(SocketOption.MAXMSGSIZE), 1048576)
+
+        socket.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testUInt64Option(): Unit {
+        let ctx = ZmqContext()
+        let socket = ctx.socket(SocketType.REQ)
+
+        socket.setUInt64Option(SocketOption.AFFINITY, 1)
+        @Assert(socket.getUInt64Option(SocketOption.AFFINITY), 1)
+
+        socket.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testBinaryOption(): Unit {
+        let ctx = ZmqContext()
+        let router = ctx.socket(SocketType.ROUTER)
+
+        let identity = Array<UInt8>(3, repeat: 0)
+        identity[0] = 1
+        identity[1] = 2
+        identity[2] = 3
+        router.setBinaryOption(SocketOption.IDENTITY, identity)
+        let readBack = router.getBinaryOption(SocketOption.IDENTITY)
+        @Assert(readBack.size, 3)
+        @Assert(readBack[0], 1)
+        @Assert(readBack[1], 2)
+        @Assert(readBack[2], 3)
+
+        router.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testSetUnsubscribe(): Unit {
+        let ctx = ZmqContext()
+        let sub = ctx.socket(SocketType.SUB)
+        sub.setSubscribe("topic1")
+        sub.setUnsubscribe("topic1")
+        sub.close()
+        ctx.close()
+    }
 }
