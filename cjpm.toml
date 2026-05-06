@@ -4,14 +4,13 @@
   organization = ""
   description = "ZeroMQ bindings for Cangjie"
   version = "0.0.1"
-  target-dir = ""
-  script-dir = ""
   output-type = "static"
-  compile-option = ""
-  override-compile-option = ""
-  link-option = ""
-  package-configuration = {}
+  repository = "https://github.com/gtn1024/zmq4cj"
   license = ["MIT"]
+  tag = ["zeromq", "zmq", "network", "messaging"]
+  category = ["Network"]
+  include = ["src", "build.cj", "vendor/libzmq"]
+  exclude = ["vendor/build"]
 
 [dependencies]
 
