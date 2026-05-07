@@ -32,6 +32,19 @@ Add to your `cjpm.toml`:
   zmq = "0.0.1"
 ```
 
+> **Note:** libzmq is a C++ library. You also need to add the C++ runtime link options for your platform:
+>
+> ```toml
+> [target.x86_64-unknown-linux-gnu]
+>   link-option = "-lstdc++ -lgcc_s"
+> [target.aarch64-unknown-linux-gnu]
+>   link-option = "-lstdc++ -lgcc_s"
+> [target.x86_64-apple-darwin]
+>   link-option = "-lc++"
+> [target.aarch64-apple-darwin]
+>   link-option = "-lc++"
+> ```
+
 ### From source
 
 ```bash

@@ -32,6 +32,19 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
   zmq = "0.0.1"
 ```
 
+> **注意：** libzmq 是 C++ 库，你还需要根据平台添加 C++ 运行时链接选项：
+>
+> ```toml
+> [target.x86_64-unknown-linux-gnu]
+>   link-option = "-lstdc++ -lgcc_s"
+> [target.aarch64-unknown-linux-gnu]
+>   link-option = "-lstdc++ -lgcc_s"
+> [target.x86_64-apple-darwin]
+>   link-option = "-lc++"
+> [target.aarch64-apple-darwin]
+>   link-option = "-lc++"
+> ```
+
 ### 从源码构建
 
 ```bash

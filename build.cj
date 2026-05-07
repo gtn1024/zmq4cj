@@ -44,14 +44,25 @@ func stagePreBuild(): Int64 {
     let platform = getPlatformDir()
     let buildDir = "vendor/build/${platform}"
     let libPath = "${buildDir}/lib/libzmq.a"
+    let vendorLibPath = "${buildDir}/lib/libzmq_vendor.a"
 
-    if (exists(libPath)) {
+    if (exists(vendorLibPath)) {
         return 0
     }
 
     if (!exists("vendor/libzmq/CMakeLists.txt")) {
-        println("ERROR: libzmq submodule not found. Run: git submodule update --init --recursive")
-        return 1
+        if (exists(".git")) {
+            println("Initializing libzmq submodule...")
+            let rc = runCmd("git submodule update --init --recursive")
+            if (rc != 0) {
+                println("ERROR: git submodule init failed with return code ${rc}")
+                return 1
+            }
+        }
+        if (!exists("vendor/libzmq/CMakeLists.txt")) {
+            println("ERROR: libzmq source not found. If building from git, run: git submodule update --init --recursive")
+            return 1
+        }
     }
 
     ensureDir(buildDir)
@@ -71,16 +82,13 @@ func stagePreBuild(): Int64 {
         return 1
     }
 
-    let vendorLibPath = "${buildDir}/lib/libzmq_vendor.a"
-    if (!exists(vendorLibPath)) {
-        let cpRc = runCmd("cp ${libPath} ${vendorLibPath}")
-        if (cpRc != 0) {
-            println("ERROR: failed to copy ${libPath} to ${vendorLibPath}")
-            return 1
-        }
+    let cpRc = runCmd("cp ${libPath} ${vendorLibPath}")
+    if (cpRc != 0) {
+        println("ERROR: failed to create ${vendorLibPath}")
+        return 1
     }
 
-    println("libzmq built successfully: ${libPath}")
+    println("libzmq built successfully")
     0
 }
 
