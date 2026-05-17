@@ -13,6 +13,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Get submodule hash
+        id: submodule-hash
+        run: echo "hash=$(git -C vendor/libzmq rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: vendor/build
+          key: libzmq-${{ runner.os }}-${{ hashFiles('build.cj') }}-${{ steps.submodule-hash.outputs.hash }}
       - name: Install cmake (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y cmake
