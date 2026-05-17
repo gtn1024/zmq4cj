@@ -828,4 +828,71 @@ public class ZmqPatternTest {
         client.close()
         ctx.close()
     }
+
+    @TestCase
+    func testProxyClosedSocket(): Unit {
+        let ctx = ZmqContext()
+        let frontend = ctx.socket(SocketType.PULL)
+        let backend = ctx.socket(SocketType.PUSH)
+        frontend.close()
+
+        var caught = false
+        try {
+            ZmqProxy.start(frontend, backend)
+        } catch (e: ZmqError) {
+            caught = true
+        }
+        @Assert(caught, true)
+
+        backend.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testProxyXpubXsubForwarding(): Unit {
+        let ctx = ZmqContext()
+        let xsub = ctx.socket(SocketType.XSUB)
+        let xpub = ctx.socket(SocketType.XPUB)
+        let control = ctx.socket(SocketType.PAIR)
+
+        xsub.bind("tcp://*:5650")
+        xpub.bind("tcp://*:5651")
+        control.bind("inproc://proxy-xpubxsub-ctrl")
+
+        let counter = SyncCounter(1)
+        spawn {
+            ZmqProxy.startSteerable(xsub, xpub, control)
+            xsub.close()
+            xpub.close()
+            control.close()
+            counter.dec()
+        }
+
+        sleep(Duration.millisecond * 100)
+
+        let pub = ctx.socket(SocketType.PUB)
+        let sub = ctx.socket(SocketType.SUB)
+        pub.connect("tcp://localhost:5650")
+        sub.connect("tcp://localhost:5651")
+        sub.setSubscribe("")
+        sub.setIntOption(SocketOption.RCVTIMEO, 3000)
+
+        sleep(Duration.millisecond * 200)
+
+        pub.send("xpubxsub-msg".toArray())
+        let msg = sub.recv()
+        @Assert(String.fromUtf8(msg), "xpubxsub-msg")
+
+        let ctrlClient = ctx.socket(SocketType.PAIR)
+        ctrlClient.connect("inproc://proxy-xpubxsub-ctrl")
+        sleep(Duration.millisecond * 50)
+        ctrlClient.send("TERMINATE".toArray())
+
+        counter.waitUntilZero()
+
+        ctrlClient.close()
+        pub.close()
+        sub.close()
+        ctx.close()
+    }
 }
