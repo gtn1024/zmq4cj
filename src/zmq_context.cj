@@ -34,7 +34,7 @@ public class ZmqContext <: Resource {
     public func set(option: ContextOption, value: Int32): Unit {
         synchronized(mutex) {
             if (closed.load()) {
-                throw ZmqError(156384765)
+                throw ZmqError(ZMQ_ETERM_VAL)
             }
             unsafe {
                 checkResult(zmq_ctx_set(handle, option.value, value))
@@ -45,7 +45,7 @@ public class ZmqContext <: Resource {
     public func get(option: ContextOption): Int32 {
         synchronized(mutex) {
             if (closed.load()) {
-                throw ZmqError(156384765)
+                throw ZmqError(ZMQ_ETERM_VAL)
             }
             unsafe {
                 let rc = zmq_ctx_get(handle, option.value)
