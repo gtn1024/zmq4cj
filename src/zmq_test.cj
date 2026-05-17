@@ -716,4 +716,116 @@ public class ZmqPatternTest {
         sub.close()
         ctx.close()
     }
+
+    @TestCase
+    func testProxyPushPull(): Unit {
+        let ctx = ZmqContext()
+        let frontend = ctx.socket(SocketType.PULL)
+        let backend = ctx.socket(SocketType.PUSH)
+        let control = ctx.socket(SocketType.PAIR)
+
+        frontend.bind("tcp://*:5630")
+        backend.bind("tcp://*:5631")
+        control.bind("inproc://proxy-ctrl")
+
+        let counter = SyncCounter(1)
+        spawn {
+            ZmqProxy.startSteerable(frontend, backend, control)
+            counter.dec()
+        }
+
+        sleep(Duration.millisecond * 100)
+
+        let push = ctx.socket(SocketType.PUSH)
+        let pull = ctx.socket(SocketType.PULL)
+        push.connect("tcp://localhost:5630")
+        pull.connect("tcp://localhost:5631")
+        pull.setIntOption(SocketOption.RCVTIMEO, 3000)
+
+        sleep(Duration.millisecond * 200)
+
+        push.send("through-proxy".toArray())
+        let msg = pull.recv()
+        @Assert(String.fromUtf8(msg), "through-proxy")
+
+        let ctrlClient = ctx.socket(SocketType.PAIR)
+        ctrlClient.connect("inproc://proxy-ctrl")
+        sleep(Duration.millisecond * 50)
+        ctrlClient.send("TERMINATE".toArray())
+
+        counter.waitUntilZero()
+
+        ctrlClient.close()
+        push.close()
+        pull.close()
+        frontend.close()
+        backend.close()
+        control.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testProxySteerableTerminate(): Unit {
+        let ctx = ZmqContext()
+        let xsub = ctx.socket(SocketType.XSUB)
+        let xpub = ctx.socket(SocketType.XPUB)
+        let control = ctx.socket(SocketType.PAIR)
+
+        xsub.bind("tcp://*:5620")
+        xpub.bind("tcp://*:5621")
+        control.bind("inproc://proxy-control-steerable")
+
+        let counter = SyncCounter(1)
+        spawn {
+            ZmqProxy.startSteerable(xsub, xpub, control)
+            counter.dec()
+        }
+
+        sleep(Duration.millisecond * 100)
+
+        let client = ctx.socket(SocketType.PAIR)
+        client.connect("inproc://proxy-control-steerable")
+        sleep(Duration.millisecond * 100)
+        client.send("TERMINATE".toArray())
+
+        counter.waitUntilZero()
+
+        client.close()
+        control.close()
+        xsub.close()
+        xpub.close()
+        ctx.close()
+    }
+
+    @TestCase
+    func testProxyContextTerminate(): Unit {
+        let ctx = ZmqContext()
+        let frontend = ctx.socket(SocketType.PULL)
+        let backend = ctx.socket(SocketType.PUSH)
+        let control = ctx.socket(SocketType.PAIR)
+
+        frontend.bind("tcp://*:5640")
+        backend.bind("tcp://*:5641")
+        control.bind("inproc://proxy-term-ctrl")
+
+        let counter = SyncCounter(1)
+        spawn {
+            ZmqProxy.startSteerable(frontend, backend, control)
+            frontend.close()
+            backend.close()
+            control.close()
+            counter.dec()
+        }
+
+        sleep(Duration.millisecond * 100)
+
+        let client = ctx.socket(SocketType.PAIR)
+        client.connect("inproc://proxy-term-ctrl")
+        sleep(Duration.millisecond * 50)
+        client.send("TERMINATE".toArray())
+
+        counter.waitUntilZero()
+        client.close()
+        ctx.close()
+    }
 }
