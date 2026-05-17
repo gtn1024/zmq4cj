@@ -69,7 +69,7 @@ func stagePreBuild(): Int64 {
 
     println("Building libzmq for ${platform}...")
 
-    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF${getCmakeExtraFlags()}"
+    let cmakeCmd = "cmake -S vendor/libzmq -B ${buildDir} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED=OFF -DBUILD_TESTS=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5${getCmakeExtraFlags()}"
     let cmakeRc = runCmd(cmakeCmd)
     if (cmakeRc != 0) {
         println("ERROR: cmake failed with return code ${cmakeRc}")
