@@ -11,6 +11,7 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 - **安全 API**：`Resource` 接口自动管理生命周期，异常替代错误码，不暴露 `unsafe`/`CPointer`
 - **静态链接**：构建时从源码编译 libzmq，用户无需单独安装
 - **核心模式**：REQ/REP、PUB/SUB、PUSH/PULL、DEALER/ROUTER、PAIR
+- **内置代理**：`ZmqProxy.start()` / `ZmqProxy.startSteerable()` 消息转发
 - **多部分消息**：`sendMultipart` / `recvMultipart`
 - **跨平台**：Linux（x86_64 + ARM64）、macOS（x86_64 + ARM64）
 - **线程安全上下文**：`ZmqContext.close()` 和 `socket()` 由 `Mutex` + `AtomicBool` 保护
@@ -183,6 +184,31 @@ if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
 }
 ```
 
+### 代理（zmq_proxy）
+
+```cangjie
+let frontend = ctx.socket(SocketType.PULL)
+let backend = ctx.socket(SocketType.PUSH)
+let control = ctx.socket(SocketType.PAIR)
+
+frontend.bind("tcp://*:5555")
+backend.bind("tcp://*:5556")
+control.bind("inproc://control")
+
+// 阻塞当前线程，在 spawn 中运行
+spawn {
+    ZmqProxy.startSteerable(frontend, backend, control)
+    frontend.close()
+    backend.close()
+    control.close()
+}
+
+// 通过 control socket 终止代理
+let client = ctx.socket(SocketType.PAIR)
+client.connect("inproc://control")
+client.send("TERMINATE".toArray())
+```
+
 ## API 参考
 
 ### ZmqContext
@@ -254,6 +280,15 @@ if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
 | 24 | `RCVHWM` | 接收高水位 |
 | 27 | `RCVTIMEO` | 接收超时（毫秒） |
 | 28 | `SNDTIMEO` | 发送超时（毫秒） |
+
+### ZmqProxy
+
+提供内置 ZMQ 代理的静态类，用于在 Socket 之间转发消息。
+
+| 方法 | 说明 |
+|------|------|
+| `start(frontend, backend, capture?)` | 启动阻塞代理。上下文终止时（ETERM）返回。 |
+| `startSteerable(frontend, backend, capture?, control)` | 启动可控代理。向 control socket 发送 `"TERMINATE"` 可停止代理。 |
 
 ### ZmqError
 

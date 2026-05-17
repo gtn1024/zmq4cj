@@ -11,6 +11,7 @@ ZeroMQ (libzmq v4.3.5) bindings for the Cangjie (仓颉) programming language. S
 - **Safe API**: `Resource` interface for automatic cleanup, exceptions instead of error codes, no `unsafe`/`CPointer` exposed to users
 - **Static linking**: libzmq is compiled from source during build — users don't need to install libzmq separately
 - **Core patterns**: REQ/REP, PUB/SUB, PUSH/PULL, DEALER/ROUTER, PAIR
+- **Built-in proxy**: `ZmqProxy.start()` / `ZmqProxy.startSteerable()` for message forwarding
 - **Multipart messages**: `sendMultipart` / `recvMultipart`
 - **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64)
 - **Thread-safe context**: `ZmqContext.close()` and `socket()` are protected by `Mutex` + `AtomicBool`
@@ -183,6 +184,31 @@ if (ready > 0 && (list[0].revents & PollEvent.POLLIN.value) != Int16(0)) {
 }
 ```
 
+### Proxy (zmq_proxy)
+
+```cangjie
+let frontend = ctx.socket(SocketType.PULL)
+let backend = ctx.socket(SocketType.PUSH)
+let control = ctx.socket(SocketType.PAIR)
+
+frontend.bind("tcp://*:5555")
+backend.bind("tcp://*:5556")
+control.bind("inproc://control")
+
+// Blocks current thread, run in a spawned thread
+spawn {
+    ZmqProxy.startSteerable(frontend, backend, control)
+    frontend.close()
+    backend.close()
+    control.close()
+}
+
+// Terminate proxy via control socket
+let client = ctx.socket(SocketType.PAIR)
+client.connect("inproc://control")
+client.send("TERMINATE".toArray())
+```
+
 ## API Reference
 
 ### ZmqContext
@@ -254,6 +280,15 @@ Represents a ZMQ socket. Implements `Resource` for `try-with-resources`.
 | 24 | `RCVHWM` | High water mark for inbound messages |
 | 27 | `RCVTIMEO` | Receive timeout (ms) |
 | 28 | `SNDTIMEO` | Send timeout (ms) |
+
+### ZmqProxy
+
+Static class providing built-in ZMQ proxy for message forwarding between sockets.
+
+| Method | Description |
+|--------|-------------|
+| `start(frontend, backend, capture?)` | Starts a blocking proxy. Returns when context is terminated (ETERM). |
+| `startSteerable(frontend, backend, capture?, control)` | Starts a controllable proxy. Send `"TERMINATE"` to control socket to stop. |
 
 ### ZmqError
 

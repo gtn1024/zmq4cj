@@ -16,7 +16,7 @@ zmq is a ZeroMQ (libzmq) binding library for the Cangjie (仓颉) programming la
 
 ```bash
 cjpm build                                    # Compile (auto-builds libzmq on first run)
-cjpm test                                     # Run unit tests (24 tests)
+cjpm test                                     # Run unit tests
 cd benchmark && cjpm run                      # Run benchmarks (~5 min)
 ```
 
@@ -30,8 +30,9 @@ src/
 ├── zmq_context.cj    # ZmqContext class (Resource interface)
 ├── zmq_socket.cj     # ZmqSocket class (Resource interface)
 ├── zmq_poll.cj       # PollItem class, ZmqPoll static class (zmq_poll wrapper)
+├── zmq_proxy_class.cj # ZmqProxy static class (zmq_proxy/zmq_proxy_steerable wrapper)
 ├── zmq_common.cj     # Internal String↔CString conversion utilities
-└── zmq_test.cj       # Unit tests (24 tests)
+└── zmq_test.cj       # Unit tests
 build.cj              # Pre-build script: compiles libzmq.a from source
 cjpm.toml             # Package config with [ffi.c] per target platform
 benchmark/            # Standalone benchmark project (cjpm run)
@@ -43,7 +44,7 @@ vendor/libzmq/        # git submodule (libzmq source)
 Three-layer design:
 1. **FFI layer** (`zmq_ffi.cj`): Raw `foreign func` declarations, 1:1 mapping to C API. All calls require `unsafe` blocks.
 2. **Internal layer** (`zmq_common.cj`, `zmq_error.cj`): CString conversion, error checking via `checkResult(rc)`.
-3. **Public API** (`zmq_context.cj`, `zmq_socket.cj`, `zmq_poll.cj`, `zmq_types.cj`): Safe API using `Resource` interface, exceptions instead of error codes. No `unsafe`/`CPointer`/`CString` exposed to users.
+3. **Public API** (`zmq_context.cj`, `zmq_socket.cj`, `zmq_poll.cj`, `zmq_proxy_class.cj`, `zmq_types.cj`): Safe API using `Resource` interface, exceptions instead of error codes. No `unsafe`/`CPointer`/`CString` exposed to users.
 
 ## Cangjie Gotchas
 
