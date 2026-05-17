@@ -896,3 +896,52 @@ public class ZmqPatternTest {
         ctx.close()
     }
 }
+
+@Test
+public class ZmqContextOptionTest {
+    @TestCase
+    func testSetGetIoThreads(): Unit {
+        let ctx = ZmqContext()
+        ctx.set(ContextOption.IO_THREADS, 2)
+        let val = ctx.get(ContextOption.IO_THREADS)
+        ctx.close()
+        if (val != 2) {
+            throw Exception("IO_THREADS should be 2, got ${val}")
+        }
+    }
+
+    @TestCase
+    func testGetSocketLimit(): Unit {
+        let ctx = ZmqContext()
+        let val = ctx.get(ContextOption.SOCKET_LIMIT)
+        ctx.close()
+        if (val <= 0) {
+            throw Exception("SOCKET_LIMIT should be positive, got ${val}")
+        }
+    }
+
+    @TestCase
+    func testSetGetOnClosedContextThrows(): Unit {
+        let ctx = ZmqContext()
+        ctx.close()
+        try {
+            ctx.set(ContextOption.IO_THREADS, 4)
+            throw Exception("should throw on closed context")
+        } catch (_: ZmqError) {}
+        try {
+            ctx.get(ContextOption.IO_THREADS)
+            throw Exception("should throw on closed context")
+        } catch (_: ZmqError) {}
+    }
+
+    @TestCase
+    func testSetGetMaxSockets(): Unit {
+        let ctx = ZmqContext()
+        ctx.set(ContextOption.MAX_SOCKETS, 512)
+        let val = ctx.get(ContextOption.MAX_SOCKETS)
+        ctx.close()
+        if (val != 512) {
+            throw Exception("MAX_SOCKETS should be 512, got ${val}")
+        }
+    }
+}

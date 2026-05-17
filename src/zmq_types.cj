@@ -34,6 +34,32 @@ public enum SocketType {
     }
 }
 
+public enum ContextOption {
+    | IO_THREADS
+    | MAX_SOCKETS
+    | SOCKET_LIMIT
+    | THREAD_PRIORITY
+    | THREAD_SCHED_POLICY
+    | MAX_MSGSZ
+    | MSG_T_SIZE
+    | THREAD_NAME_PREFIX
+
+    public prop value: Int32 {
+        get() {
+            match (this) {
+                case IO_THREADS => 1
+                case MAX_SOCKETS => 2
+                case SOCKET_LIMIT => 3
+                case THREAD_PRIORITY => 3
+                case THREAD_SCHED_POLICY => 4
+                case MAX_MSGSZ => 5
+                case MSG_T_SIZE => 6
+                case THREAD_NAME_PREFIX => 9
+            }
+        }
+    }
+}
+
 public enum SocketOption {
     | SUBSCRIBE
     | UNSUBSCRIBE

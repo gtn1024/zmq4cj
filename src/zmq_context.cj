@@ -31,6 +31,32 @@ public class ZmqContext <: Resource {
         }
     }
 
+    public func set(option: ContextOption, value: Int32): Unit {
+        synchronized(mutex) {
+            if (closed.load()) {
+                throw ZmqError(156384765)
+            }
+            unsafe {
+                checkResult(zmq_ctx_set(handle, option.value, value))
+            }
+        }
+    }
+
+    public func get(option: ContextOption): Int32 {
+        synchronized(mutex) {
+            if (closed.load()) {
+                throw ZmqError(156384765)
+            }
+            unsafe {
+                let rc = zmq_ctx_get(handle, option.value)
+                if (rc == -1) {
+                    throw ZmqError(zmq_errno())
+                }
+                rc
+            }
+        }
+    }
+
     public func socket(type_: SocketType): ZmqSocket {
         synchronized(mutex) {
             if (closed.load()) {
