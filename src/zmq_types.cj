@@ -117,16 +117,16 @@ public enum SocketOption {
                 case SNDTIMEO => 28
                 case ROUTER_MANDATORY => 33
                 case TCP_KEEPALIVE => 34
-                case TCP_KEEPALIVE_IDLE => 35
-                case TCP_KEEPALIVE_INTVL => 36
+                case TCP_KEEPALIVE_IDLE => 36
+                case TCP_KEEPALIVE_INTVL => 37
                 case PROBE_ROUTER => 51
                 case REQ_CORRELATE => 52
                 case REQ_RELAXED => 53
                 case IPV4ONLY => 46
                 case HANDSHAKE_IVL => 66
                 case HEARTBEAT_IVL => 75
-                case HEARTBEAT_TIMEOUT => 76
-                case HEARTBEAT_TTL => 77
+                case HEARTBEAT_TIMEOUT => 77
+                case HEARTBEAT_TTL => 76
                 case CONNECT_TIMEOUT => 79
                 case ROUTING_ID => 80
             }
