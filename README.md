@@ -46,6 +46,10 @@ Add to your `cjpm.toml`:
 >   link-option = "-lc++"
 > ```
 
+Then build your project with `cjpm build`. The zmq library will be downloaded and libzmq compiled from source automatically during the build.
+
+> **Important:** Do not use `cjpm update` alone — it does not execute the pre-build script that compiles libzmq. Use `cjpm build` directly, which handles dependency resolution, pre-build, and compilation in the correct order.
+
 ### From source
 
 ```bash

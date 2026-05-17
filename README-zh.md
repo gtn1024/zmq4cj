@@ -46,6 +46,10 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 >   link-option = "-lc++"
 > ```
 
+然后使用 `cjpm build` 构建项目。构建过程中会自动下载 zmq 并从源码编译 libzmq。
+
+> **重要提示：** 请勿单独使用 `cjpm update` — 它不会执行编译 libzmq 的预构建脚本。请直接使用 `cjpm build`，它会按正确顺序处理依赖解析、预构建和编译。
+
 ### 从源码构建
 
 ```bash
