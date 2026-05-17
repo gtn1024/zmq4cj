@@ -30,7 +30,7 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 
 ```toml
 [dependencies]
-  zmq = "0.1.0"
+  zmq = "0.2.0"
 ```
 
 > **注意：** libzmq 是 C++ 库，你还需要根据平台添加 C++ 运行时链接选项：
