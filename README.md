@@ -13,7 +13,7 @@ ZeroMQ (libzmq v4.3.5) bindings for the Cangjie (仓颉) programming language. S
 - **Core patterns**: REQ/REP, PUB/SUB, PUSH/PULL, DEALER/ROUTER, PAIR
 - **Built-in proxy**: `ZmqProxy.start()` / `ZmqProxy.startSteerable()` for message forwarding
 - **Multipart messages**: `sendMultipart` / `recvMultipart`
-- **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64)
+- **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64) — Windows not yet supported
 - **Thread-safe context**: `ZmqContext.close()` and `socket()` are protected by `Mutex` + `AtomicBool`
 
 ## Prerequisites

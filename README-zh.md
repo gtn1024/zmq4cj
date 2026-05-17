@@ -13,7 +13,7 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 - **核心模式**：REQ/REP、PUB/SUB、PUSH/PULL、DEALER/ROUTER、PAIR
 - **内置代理**：`ZmqProxy.start()` / `ZmqProxy.startSteerable()` 消息转发
 - **多部分消息**：`sendMultipart` / `recvMultipart`
-- **跨平台**：Linux（x86_64 + ARM64）、macOS（x86_64 + ARM64）
+- **跨平台**：Linux（x86_64 + ARM64）、macOS（x86_64 + ARM64）— 暂不支持 Windows
 - **线程安全上下文**：`ZmqContext.close()` 和 `socket()` 由 `Mutex` + `AtomicBool` 保护
 
 ## 环境要求
