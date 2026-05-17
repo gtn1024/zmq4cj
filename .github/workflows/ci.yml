@@ -27,6 +27,21 @@ jobs:
         with:
           channel: sts
           version: 1.1.0
+      - name: Verify enum constants match zmq.h
+        shell: bash
+        run: |
+          errors=0
+          grep 'case [A-Z_]* => [0-9]*' src/zmq_types.cj | sed 's/.*case //;s/ => /=/' | while IFS='=' read -r name value; do
+            if [ "$name" = "IDENTITY" ]; then continue; fi
+            expected=$(grep "define ZMQ_${name} " vendor/libzmq/include/zmq.h | head -1 | awk '{print $3}')
+            if [ -z "$expected" ]; then echo "SKIP ${name}"; continue; fi
+            if [ "$value" != "$expected" ]; then
+              echo "ERROR: ${name} expected ${expected}, got ${value}"
+              exit 1
+            else
+              echo "OK ${name}=${value}"
+            fi
+          done
       - name: build
         shell: bash
         run: cjpm build

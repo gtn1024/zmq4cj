@@ -128,7 +128,7 @@ public enum SocketOption {
                 case HEARTBEAT_TIMEOUT => 77
                 case HEARTBEAT_TTL => 76
                 case CONNECT_TIMEOUT => 79
-                case ROUTING_ID => 80
+                case ROUTING_ID => 5
             }
         }
     }
