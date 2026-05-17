@@ -29,7 +29,7 @@ Add to your `cjpm.toml`:
 
 ```toml
 [dependencies]
-  zmq = "0.0.1"
+  zmq = "0.1.0"
 ```
 
 > **Note:** libzmq is a C++ library. You also need to add the C++ runtime link options for your platform:
