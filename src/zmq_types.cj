@@ -122,7 +122,7 @@ public enum SocketOption {
                 case PROBE_ROUTER => 51
                 case REQ_CORRELATE => 52
                 case REQ_RELAXED => 53
-                case IPV4ONLY => 46
+                case IPV4ONLY => 31
                 case HANDSHAKE_IVL => 66
                 case HEARTBEAT_IVL => 75
                 case HEARTBEAT_TIMEOUT => 77

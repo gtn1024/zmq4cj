@@ -3,7 +3,7 @@
   name = "zmq"
   organization = ""
   description = "ZeroMQ bindings for Cangjie"
-  version = "0.2.0"
+  version = "0.2.1"
   output-type = "static"
   repository = "https://github.com/gtn1024/zmq4cj"
   license = ["MIT"]
