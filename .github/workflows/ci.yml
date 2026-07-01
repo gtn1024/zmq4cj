@@ -12,7 +12,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # macos-latest is rolling to macOS 26 (Tahoe) since 2026-06-15; that
+        # image's Xcode/libSystem.tbd intermittently breaks Cangjie's bundled
+        # ld64.lld ("libSystem.tbd is incompatible with arm64"). Pin to macOS
+        # 15 (Sequoia), which is stable and still in support.
+        os: [ubuntu-latest, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
