@@ -14,7 +14,7 @@ public class ZmqPatternTest {
         let req = ctx.socket(SocketType.REQ)
 
         rep.bind("tcp://*:5555")
-        req.connect("tcp://localhost:5555")
+        req.connect("tcp://127.0.0.1:5555")
 
         let fut = spawn {
             let msg = rep.recv()
@@ -43,7 +43,7 @@ public class ZmqPatternTest {
         let sub = ctx.socket(SocketType.SUB)
 
         pub.bind("tcp://*:5556")
-        sub.connect("tcp://localhost:5556")
+        sub.connect("tcp://127.0.0.1:5556")
         sub.setSubscribe("weather.")
 
         sleep(Duration.millisecond * 200)
@@ -66,7 +66,7 @@ public class ZmqPatternTest {
         let dealer = ctx.socket(SocketType.DEALER)
 
         router.bind("tcp://*:5558")
-        dealer.connect("tcp://localhost:5558")
+        dealer.connect("tcp://127.0.0.1:5558")
 
         sleep(Duration.millisecond * 100)
 
@@ -111,7 +111,7 @@ public class ZmqPatternTest {
         let push = ctx.socket(SocketType.PUSH)
 
         pull.bind("tcp://*:5557")
-        push.connect("tcp://localhost:5557")
+        push.connect("tcp://127.0.0.1:5557")
 
         sleep(Duration.millisecond * 100)
 
@@ -131,7 +131,7 @@ public class ZmqPatternTest {
         let push = ctx.socket(SocketType.PUSH)
 
         pull.bind("tcp://*:5560")
-        push.connect("tcp://localhost:5560")
+        push.connect("tcp://127.0.0.1:5560")
 
         sleep(Duration.millisecond * 100)
 
@@ -157,7 +157,7 @@ public class ZmqPatternTest {
         let dealer = ctx.socket(SocketType.DEALER)
 
         router.bind("tcp://*:5561")
-        dealer.connect("tcp://localhost:5561")
+        dealer.connect("tcp://127.0.0.1:5561")
 
         sleep(Duration.millisecond * 100)
 
@@ -187,7 +187,7 @@ public class ZmqPatternTest {
         let push = ctx.socket(SocketType.PUSH)
 
         pull.bind("tcp://*:5562")
-        push.connect("tcp://localhost:5562")
+        push.connect("tcp://127.0.0.1:5562")
 
         sleep(Duration.millisecond * 100)
 
@@ -221,7 +221,7 @@ public class ZmqPatternTest {
         let push = ctx.socket(SocketType.PUSH)
 
         pull.bind("tcp://*:5563")
-        push.connect("tcp://localhost:5563")
+        push.connect("tcp://127.0.0.1:5563")
 
         sleep(Duration.millisecond * 100)
 
@@ -247,7 +247,7 @@ public class ZmqPatternTest {
         let push = ctx.socket(SocketType.PUSH)
 
         pull.bind("tcp://*:5564")
-        push.connect("tcp://localhost:5564")
+        push.connect("tcp://127.0.0.1:5564")
 
         sleep(Duration.millisecond * 100)
 
@@ -431,7 +431,7 @@ public class ZmqPatternTest {
         let req = ctx.socket(SocketType.REQ)
 
         rep.bind("tcp://*:5570")
-        req.connect("tcp://localhost:5570")
+        req.connect("tcp://127.0.0.1:5570")
 
         req.setIntOption(SocketOption.RCVTIMEO, 100)
 
@@ -455,7 +455,7 @@ public class ZmqPatternTest {
         let sub = ctx.socket(SocketType.SUB)
 
         pub.bind("tcp://*:5571")
-        sub.connect("tcp://localhost:5571")
+        sub.connect("tcp://127.0.0.1:5571")
         sub.setSubscribe("")
         sub.setStringOption(SocketOption.UNSUBSCRIBE, "")
 
@@ -484,7 +484,7 @@ public class ZmqPatternTest {
         let pull = ctx.socket(SocketType.PULL)
 
         push.bind("tcp://*:5580")
-        pull.connect("tcp://localhost:5580")
+        pull.connect("tcp://127.0.0.1:5580")
 
         push.send("hello".toArray())
 
@@ -528,7 +528,7 @@ public class ZmqPatternTest {
         let pull2 = ctx.socket(SocketType.PULL)
 
         push1.bind("tcp://*:5582")
-        pull1.connect("tcp://localhost:5582")
+        pull1.connect("tcp://127.0.0.1:5582")
         pull2.bind("tcp://*:5583")
 
         push1.send("msg1".toArray())
@@ -555,7 +555,7 @@ public class ZmqPatternTest {
         let sub = ctx.socket(SocketType.SUB)
 
         xpub.bind("tcp://*:5590")
-        sub.connect("tcp://localhost:5590")
+        sub.connect("tcp://127.0.0.1:5590")
 
         sleep(Duration.millisecond * 200)
 
@@ -738,8 +738,8 @@ public class ZmqPatternTest {
 
         let push = ctx.socket(SocketType.PUSH)
         let pull = ctx.socket(SocketType.PULL)
-        push.connect("tcp://localhost:5630")
-        pull.connect("tcp://localhost:5631")
+        push.connect("tcp://127.0.0.1:5630")
+        pull.connect("tcp://127.0.0.1:5631")
         pull.setIntOption(SocketOption.RCVTIMEO, 3000)
 
         sleep(Duration.millisecond * 200)
@@ -872,8 +872,8 @@ public class ZmqPatternTest {
 
         let pub = ctx.socket(SocketType.PUB)
         let sub = ctx.socket(SocketType.SUB)
-        pub.connect("tcp://localhost:5650")
-        sub.connect("tcp://localhost:5651")
+        pub.connect("tcp://127.0.0.1:5650")
+        sub.connect("tcp://127.0.0.1:5651")
         sub.setSubscribe("")
         sub.setIntOption(SocketOption.RCVTIMEO, 3000)
 

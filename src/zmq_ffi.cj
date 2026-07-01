@@ -116,7 +116,7 @@ foreign func zmq_msg_data(msg: CPointer<ZmqMsg>): CPointer<Unit>
 
 foreign func zmq_msg_size(msg: CPointer<ZmqMsg>): UIntNative
 
-foreign func zmq_poll(items: CPointer<Unit>, nitems: Int32, timeout: Int64): Int32
+foreign func zmq_poll(items: CPointer<ZmqPollItem>, nitems: Int32, timeout: Int64): Int32
 
 foreign func zmq_proxy(frontend: CPointer<Unit>, backend: CPointer<Unit>, capture: CPointer<Unit>): Int32
 

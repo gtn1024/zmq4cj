@@ -76,8 +76,8 @@ Three-layer design:
 - `ZmqContext` and `ZmqSocket` implement `Resource` for `try-with-resources` auto-cleanup
 - `close()` is idempotent — uses `AtomicBool.compareAndSwap` to ensure underlying C cleanup runs exactly once
 - `ZmqSocket` operations (`send`/`recv`/`bind`/`connect`) are NOT thread-safe — one socket per thread
-- libzmq is a C++ library; Linux needs `-lstdc++ -lgcc_s`, macOS needs `-lc++` in link options
-- **Windows not supported** — ABI mismatch between system MinGW (libstdc++) and Cangjie's bundled libc++
+- libzmq is a C++ library; Linux needs `-lstdc++ -lgcc_s`, macOS needs `-lc++`, Windows needs `-lc++ -lunwind -lws2_32 -liphlpapi` in link options
+- **Windows** supported natively: zig builds libzmq for `x86_64-windows-gnu` producing a libc++ ABI that matches Cangjie's llvm-mingw runtime (system MinGW g++ would produce libstdc++ and fail to link — the historical Windows CI failure). The whole Windows build is inlined in `build.cj` (no separate script). The same flow also works as a cross-build from Linux/macOS for local dev
 
 ## Performance Notes
 
@@ -88,9 +88,18 @@ Three-layer design:
 
 ## CI
 
-- Platforms: Linux (x86_64) + macOS (x86_64 + ARM64)
-- Windows disabled due to ABI issues
+- Platforms: Linux (x86_64) + macOS (x86_64 + ARM64) + Windows (x86_64)
+- `windows` job: runs natively on `windows-latest`; zig builds libzmq (libc++ ABI), then `cjpm build` + `cjpm test` run natively (tests execute for real, unlike a cross-build)
 - Tests use unique TCP ports per test case to avoid conflicts
+
+## Windows build (build.cj + zig)
+
+- The Windows branch is selected by `@When[target == "x86_64-w64-mingw32"]` (cjpm compiles `build.cj` with `--cfg=target=...`). Everything is inline in `stageWindowsBuild()` — no shell script. Works for native Windows builds (`cjpm build` on Windows) and cross-builds (`cjpm build --target x86_64-w64-mingw32` on Linux/macOS)
+- `ZIG` env var must point at a zig binary
+- build.cj generates (via `std.fs`) tiny platform-aware launcher scripts (`.sh` on Unix / `.bat` on Windows) for `CMAKE_C/CXX_COMPILER` (zig needs a `cc`/`c++` subcommand) and a windres shim (zig has no windres; version.rc resources are meaningless in a static `.a` — the shim copies a prebuilt empty COFF object). Plus an iphlpapi stub (Cangjie's bundled mingw is minimal)
+- `CMAKE_AR=llvm-ar` + `CMAKE_RANLIB=no-op`: cmake emits an `ld.lld`-compatible archive directly. GNU `ar`/`ranlib` archives are mis-read by `ld.lld` (all symbols come out undefined), so `ranlib` must NOT run after `llvm-ar`
+- cmake workarounds: `-DZMQ_WIN32_WINNT=0x0A00` (avoid empty `_WIN32_WINNT` when cross-compiling), `-DZMQ_HAVE_IPC=OFF` (no `sys/socket.h` on mingw), `-O2 -fno-sanitize=undefined` in the zig launchers (avoid UBSan refs)
+- **Native vs cross**: on a native Windows build (host == Windows) ffi.c resolves directly to `vendor/build/windows/lib`. On a cross-build, cjpm resolves ffi.c via the HOST target's path (`vendor/build/<host>/lib`), so `build.cj` mirrors the PE `libzmq_vendor.a` into the host lib dir and drops a `.cross-mirror` marker so a later native build detects the foreign-format artifact and rebuilds (ELF/Mach-O) instead of linking a PE lib natively
 
 ## Workflow
 

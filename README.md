@@ -13,14 +13,15 @@ ZeroMQ (libzmq v4.3.5) bindings for the Cangjie (仓颉) programming language. S
 - **Core patterns**: REQ/REP, PUB/SUB, PUSH/PULL, DEALER/ROUTER, PAIR
 - **Built-in proxy**: `ZmqProxy.start()` / `ZmqProxy.startSteerable()` for message forwarding
 - **Multipart messages**: `sendMultipart` / `recvMultipart`
-- **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64) — Windows not yet supported
+- **Cross-platform**: Linux (x86_64 + ARM64), macOS (x86_64 + ARM64), Windows (x86_64)
 - **Thread-safe context**: `ZmqContext.close()` and `socket()` are protected by `Mutex` + `AtomicBool`
 
 ## Prerequisites
 
 - Cangjie toolchain >= 1.1.0
 - CMake >= 3.15
-- C compiler (gcc / clang)
+- C compiler (gcc / clang) on Linux/macOS, or [zig](https://ziglang.org) on Windows
+  - On Windows, zig is required: it builds libzmq with a libc++ ABI that matches Cangjie's llvm-mingw runtime. System MinGW (libstdc++) does NOT work — that mismatch was the historical Windows build failure.
 
 ## Installation
 
@@ -44,6 +45,8 @@ Add to your `cjpm.toml`:
 >   link-option = "-lc++"
 > [target.aarch64-apple-darwin]
 >   link-option = "-lc++"
+> [target.x86_64-w64-mingw32]
+>   link-option = "-lc++ -lunwind -lws2_32 -liphlpapi"
 > ```
 
 Then build your project with `cjpm build`. The zmq library will be downloaded and libzmq compiled from source automatically during the build.

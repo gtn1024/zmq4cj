@@ -13,14 +13,15 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 - **核心模式**：REQ/REP、PUB/SUB、PUSH/PULL、DEALER/ROUTER、PAIR
 - **内置代理**：`ZmqProxy.start()` / `ZmqProxy.startSteerable()` 消息转发
 - **多部分消息**：`sendMultipart` / `recvMultipart`
-- **跨平台**：Linux（x86_64 + ARM64）、macOS（x86_64 + ARM64）— 暂不支持 Windows
+- **跨平台**：Linux（x86_64 + ARM64）、macOS（x86_64 + ARM64）、Windows（x86_64）
 - **线程安全上下文**：`ZmqContext.close()` 和 `socket()` 由 `Mutex` + `AtomicBool` 保护
 
 ## 环境要求
 
 - 仓颉工具链 >= 1.1.0
 - CMake >= 3.15
-- C 编译器（gcc / clang）
+- Linux/macOS 需 C 编译器（gcc / clang）；Windows 需 [zig](https://ziglang.org)
+  - Windows 上 zig 是必需的：它用 libc++ ABI 编译 libzmq，与仓颉的 llvm-mingw 运行时匹配。系统 MinGW（libstdc++）**不可用**——这个不匹配正是历史上 Windows 构建失败的原因。
 
 ## 安装
 
@@ -44,6 +45,8 @@ ZeroMQ (libzmq v4.3.5) 仓颉语言绑定库。静态链接，运行时零外部
 >   link-option = "-lc++"
 > [target.aarch64-apple-darwin]
 >   link-option = "-lc++"
+> [target.x86_64-w64-mingw32]
+>   link-option = "-lc++ -lunwind -lws2_32 -liphlpapi"
 > ```
 
 然后使用 `cjpm build` 构建项目。构建过程中会自动下载 zmq 并从源码编译 libzmq。
